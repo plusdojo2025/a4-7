@@ -1,0 +1,23 @@
+.menu {
+  display: flex;
+  justify-content: space-between; /* 等間隔に配置 */
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 10px 20px;
+}
+
+.menu-item {
+  flex: 1; /* 均等幅 */
+  text-align: center; /* 中央寄せ */
+  text-decoration: none;
+  color: #333;
+  font-weight: normal;
+  padding: 10px 0;
+  transition: background-color 0.3s;
+}
+
+.menu-item.active {
+  color: #fff;
+  background-color: #007bff;
+  font-weight: bold;
+}
