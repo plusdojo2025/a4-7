@@ -1,5 +1,6 @@
 import React from 'react';
 import Menu from '../components/MenuHeader';
+import axios from 'axios';
 
 export default class SchedulePage extends React.Component {
     constructor(props) {
@@ -35,12 +36,24 @@ export default class SchedulePage extends React.Component {
             showModal: false,
             selectedHwContents: [],
             selectedHwDate: '',
-            dragData: null
+            dragData: null, 
+            today: "2023-07-24"
         };
     }
 
     componentDidMount() {
         // 初期化やデータの取得などの処理をここに記述
+        axios.get("/privateSchedules/", {params: {
+            userId: 1,
+            vacationId: 1
+        }
+        })
+        .then (json => {
+            console.log(json);
+            this.setState({
+                //privateSchedules: json
+            });
+        });
     }
 
     handleVacationChange = (event) => {
@@ -122,7 +135,6 @@ export default class SchedulePage extends React.Component {
     render() {
         const { vacations, vacationStart, vacationEnd, privateSchedules, hwSchedulesList } = this.state;
         const dateRange = this.makeDateRange(vacationStart, vacationEnd);
-        let hwContentCnt = 0;
         return (
             <div>
                 <h1>Schedule Page</h1>
@@ -253,10 +265,7 @@ export default class SchedulePage extends React.Component {
                         </div>
                     </div>
                 )}
-
-                    
-              
-                
+ 
             </div>
         );
     }
