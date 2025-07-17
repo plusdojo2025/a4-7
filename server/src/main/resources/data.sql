@@ -24,7 +24,7 @@ insert into vacations (user_id, vacation_name, start_date, end_date) values
 (2, '夏休み', '2024-07-20', '2024-08-25');
 
 -- private_schedulesテーブル
-insert into private_schedules (user_id, content, date, vacation_id) values
+insert into private_schedules (user_id, content, content_date, vacation_id) values
 (1, 'じゅく', '2025-07-20', 1),
 (1, '海', '2025-08-01', 1),
 (2, 'りょこう', '2025-07-23', 2),
@@ -32,7 +32,7 @@ insert into private_schedules (user_id, content, date, vacation_id) values
 (2, 'はなび', '2024-08-10', 3);
 
 -- homework_schedulesテーブル
-insert into homework_schedules (user_id, column_info_id, content, date, completed, order, vacation_id) values
+insert into homework_schedules (user_id, column_info_id, content, content_date, completed, content_order, vacation_id) values
 (1, 1, 'p1~3', '2025-07-20', 0, 0, 1),
 (1, 1, 'p4~6', '2025-07-21', 0, 0, 1),
 (1, 2, '本を選ぶ', '2025-08-05', 0, 0, 1),

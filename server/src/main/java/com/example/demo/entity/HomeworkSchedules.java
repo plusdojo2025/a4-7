@@ -25,8 +25,8 @@ public class HomeworkSchedules {
     private Integer userId;
     private Integer columnInfoId;
     private String content;
-    private LocalDate date;
+    private LocalDate contentDate;
     private Boolean completed;
-    private Integer order;
+    private Integer contentOrder;
     private Integer vacationId;
 }

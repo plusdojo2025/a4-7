@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.demo.entity.PrivateSchedules;
 
 public interface PrivateSchedulesRepository extends JpaRepository<PrivateSchedules, Integer> {
-	List<PrivateSchedules> findByUserIdAndVacationId(String userId, int vacationId);
+	List<PrivateSchedules> findByUserIdAndVacationId(Integer userId, int vacationId);
 }
