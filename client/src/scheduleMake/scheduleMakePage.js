@@ -1,8 +1,8 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 export default class ScheduleMakePage extends React.Component {
     render() {
-        return(
+        return (
             <div>
 
                 {/* 休暇時期プルダウン */}
@@ -14,11 +14,17 @@ export default class ScheduleMakePage extends React.Component {
 
                 <label>開始日</label>
                 <input type="date" />
-                
+
                 <label>終了日</label>
                 <input type="date" />
-
+                
+                {/* 決定・下書きボタン */}
+                <div>
+                    <button>決定</button>
+                    <button>下書き保存</button>
+                </div>
             </div>
+
         )
     }
 }
