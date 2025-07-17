@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data // getter・setterの自動設定
-@Table(name="private_schedules") // テーブル自動生成時のテーブル名
+@Table(name="private_schedules", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","date"}) )
 public class PrivateSchedules {
 	@Id	// プライマリーキー
 	@GeneratedValue(strategy=GenerationType.IDENTITY) // オートインクリメント
