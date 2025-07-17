@@ -1,4 +1,5 @@
 import React from 'react';
+import Menu from '../components/MenuHeader';
 
 export default class SchedulePage extends React.Component {
     constructor(props) {
@@ -92,11 +93,7 @@ export default class SchedulePage extends React.Component {
         return (
             <div>
                 <h1>Schedule Page</h1>
-                <nav>
-                    <ul>
-                        <li><a href="/">予定表</a></li>
-                    </ul>
-                </nav>
+                <Menu></Menu>
 
                 {/* 休暇の選択 および 新しい予定の作成ボタン */}
                 <div>
