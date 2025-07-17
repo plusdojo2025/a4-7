@@ -19,22 +19,23 @@ export default class SchedulePage extends React.Component {
             ],
             hwSchedulesList: [
                 {name: "算数ドリル", contents: [
-                    { "date": "2023-07-22", "content": "ページ1-10を解く", "checked": true },
-                    { "date": "2023-07-22", "content": "ページ11-20を解く", "checked": false }, 
-                    { "date": "2023-07-24", "content": "ページ21-30を解く", "checked": false }
+                    { date: "2023-07-22", content: "ページ1-10を解く", checked: true },
+                    { date: "2023-07-22", content: "ページ11-20を解く", checked: false }, 
+                    { date: "2023-07-24", content: "ページ21-30を解く", checked: false }
                 ]},
                 {name: "理科ドリル", contents: [
-                    { "date": "2023-07-24", "content": "植物の成長について調べる", "checked": false },
-                    { "date": "2023-07-25", "content": "動物の生態について調べる", "checked": false }
+                    { date: "2023-07-24", content: "植物の成長について調べる", checked: false },
+                    { date: "2023-07-25", content: "動物の生態について調べる", checked: false }
                 ]},
                 {name: "国語ドリル", contents: [
-                    { "date": "2023-07-24", "content": "漢字の練習", "checked": false },
-                    { "date": "2023-07-25", "content": "読解問題を解く", "checked": false }
+                    { date: "2023-07-24", content: "漢字の練習", checked: false },
+                    { date: "2023-07-25", content: "読解問題を解く", checked: false }
                 ]}
             ], 
             showModal: false,
             selectedHwContents: [],
             selectedHwDate: '',
+            dragData: null
         };
     }
 
@@ -85,6 +86,38 @@ export default class SchedulePage extends React.Component {
         this.setState({ showModal: false });
     };
 
+    onDragStart = (hwIndex, date, contentIndex) => {
+        this.setState({ dragData: { hwIndex, date, contentIndex } });
+    };
+
+    onDragOver = (e) => {
+        e.preventDefault(); // ドロップを許可する
+    };
+
+    onDrop = (hwIndex, date) => {
+        const { dragData, hwSchedulesList } = this.state;
+        if (!dragData) return;
+
+        const draggedItem = hwSchedulesList[dragData.hwIndex].contents[dragData.contentIndex];
+
+        // ドラッグした宿題と同じ列であることを確認
+        if (dragData.hwIndex !== hwIndex) return;
+
+        // 日付だけを変更
+        const updatedHwSchedulesList = [...hwSchedulesList];
+        updatedHwSchedulesList[hwIndex].contents[dragData.contentIndex] = {
+            content: draggedItem.content,
+            checked: draggedItem.checked,
+            date: date
+        };
+
+        this.setState({
+            hwSchedulesList: updatedHwSchedulesList,
+            dragData: null
+        });
+    };
+
+
 
     render() {
         const { vacations, vacationStart, vacationEnd, privateSchedules, hwSchedulesList } = this.state;
@@ -126,13 +159,18 @@ export default class SchedulePage extends React.Component {
                                 <td>{date.dayOfWeek}</td>
 
                                 <td> {/* 私用の予定 */}
-                                    {privateSchedules.filter(event => event.date === date.date).map((event, idx) => (
+                                    {privateSchedules.map((event, idx) => {
+                                        return event.date===date.date ? (
                                         <input type="text" key={idx} value={event.event} onChange={this.editPrivateSchedule} />
-                                    ))}
+                                    ):null;
+                                    })}
                                 </td>
 
                                 {hwSchedulesList.map((hw, hwIndex) => ( // 宿題の予定
-                                    <td key={hwIndex}>
+                                    <td key={hwIndex} 
+                                        onDragOver={this.onDragOver} 
+                                        onDrop={() => this.onDrop(hwIndex, date.date)}
+                                    >
                                         {/*同じ曜日に2個以上の予定がある場合はまとめて数を表示し、数をクリックしたらモダールで詳細の予定が表示される*/}
                                         {hw.contents.filter(content => content.date === date.date).length > 1 ? (
                                             <span
@@ -147,10 +185,13 @@ export default class SchedulePage extends React.Component {
                                                 {hw.contents.filter(content => content.date === date.date).length} 件の予定
                                             </span>
                                         ) : (
-                                            hw.contents
-                                                .filter(content => content.date === date.date)
-                                                .map((content, contentIndex) => (
-                                                    <div key={contentIndex}>
+                                            hw.contents.map((content, contentIndex) => {
+                                                return content.date === date.date ? (
+                                                    <div key={contentIndex} 
+                                                        draggable
+                                                        onDragStart={() => this.onDragStart(hwIndex, content.date, contentIndex)}
+                                                        style={{cursor: 'grab'}}
+                                                    >
                                                         <input
                                                             type="checkbox"
                                                             checked={content.checked}
@@ -160,7 +201,8 @@ export default class SchedulePage extends React.Component {
                                                         />
                                                         {content.content}
                                                     </div>
-                                                ))
+                                                ): null;
+                                            })
                                         )}
                                     </td>
                                 ))}
