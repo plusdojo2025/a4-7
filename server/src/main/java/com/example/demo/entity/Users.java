@@ -1,7 +1,14 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
@@ -23,8 +30,8 @@ public class Users {
     @Column(name = "background_id")
     private Integer backgroundId;
 
-    @Column(name = "avater_id")
-    private Integer avaterId;
+    @Column(name = "avatar_id")
+    private Integer avatarId;
 }
 
 

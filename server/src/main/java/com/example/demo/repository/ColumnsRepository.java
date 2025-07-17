@@ -8,5 +8,5 @@ import com.example.demo.entity.Columns;
 import com.example.demo.entity.PrivateSchedules;
 
 public interface ColumnsRepository extends JpaRepository<Columns, Integer> {
-	List<PrivateSchedules> findByUserIdAndVacationId(String userId, int vacationId);
+	List<PrivateSchedules> findByUserIdAndVacationId(Integer userId, int vacationId);
 }
