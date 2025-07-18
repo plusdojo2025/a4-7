@@ -1,11 +1,12 @@
 import React from "react";
+import "./SugorokuCell.css"; 
 
 const TreasureBox = () => {
   return (
     <img
-      src="/treasurebox.png" 
+      src="/treasurebox.png"
       alt="宝箱"
-      className="w-10 h-10 object-contain"
+      className="treasure"
     />
   );
 };

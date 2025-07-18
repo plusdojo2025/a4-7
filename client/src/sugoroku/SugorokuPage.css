@@ -1,0 +1,46 @@
+/* sugoroku.css */
+
+.sugoroku-page {
+  padding: 16px;
+  background-color: #d1fae5; /* Tailwindのbg-green-100に近い */
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sugoroku-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.sugoroku-board {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sugoroku-cell {
+  width: 64px;
+  height: 64px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sugoroku-button {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sugoroku-button:hover {
+  background-color: #2563eb;
+}

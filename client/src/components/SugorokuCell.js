@@ -1,11 +1,8 @@
 import React from "react";
+import "./SugorokuCell.css";
 
 const SugorokuCell = ({ children }) => {
-  return (
-    <div className="w-16 h-16 border border-gray-400 rounded flex items-center justify-center bg-white shadow-sm">
-      {children}
-    </div>
-  );
+  return <div className="sugoroku-cell">{children}</div>;
 };
 
 export default SugorokuCell;

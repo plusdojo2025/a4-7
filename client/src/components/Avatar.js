@@ -1,11 +1,12 @@
 import React from "react";
+import "./SugorokuCell.css"; 
 
 const Avatar = () => {
   return (
     <img
-      src="/avatar.png" 
+      src="/avatar.png"
       alt="アバター"
-      className="w-12 h-12 object-contain"
+      className="avatar"
     />
   );
 };
