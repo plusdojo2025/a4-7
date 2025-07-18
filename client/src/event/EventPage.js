@@ -7,7 +7,7 @@ export default class EventPage extends React.Component {
         // state
         this.state = {
             events: [],                 // セレクトボックスに表示するイベント用配列
-            selectedEventId: 0,         // 選択中のイベントid
+            selectedEventIndex: 0,         // 選択中のイベントid
             selectedEventTheme: "",     // 選択中のイベントテーマ
             content: "",                // 投稿内容
             like: false,                // いいねのステータス　デフォルトはいいねしてない状態
@@ -22,7 +22,7 @@ export default class EventPage extends React.Component {
             const selectedEvent = json[json.length - 1];    // 配列末尾のイベント情報取得　デフォルトで現在開催中のイベント
             this.setState({
                 events: json,
-                selectedEventId: selectedEvent.id,
+                selectedEventIndex: json.length-1,
                 selectedEventTheme: selectedEvent.theme
             })
         });
@@ -30,12 +30,15 @@ export default class EventPage extends React.Component {
 
     // 表示イベント変更
     changeEvent = (e) => {
+        const {events} = this.state;
+        const targetIndex = e.target.value;
         this.setState({
-            selectedEventId: e.target.value
+            selectedEventIndex: targetIndex,
+            selectedEventTheme: events[targetIndex].theme
         });
         setTimeout(() => {
             // ほんの少し待ってから反映後の状態を見る
-            console.log('→' + this.state.selectedEventId);
+            console.log('→' + this.state.selectedEventIndex);
         }, 0);
     }
 
@@ -68,13 +71,13 @@ export default class EventPage extends React.Component {
     }
 
     render() {
-        const {events, selectedEventId, selectedEventTheme, content} = this.state;
+        const {events, selectedEventIndex, selectedEventTheme, content} = this.state;
         return (
             <div>
                 {/* 表示イベント選択セレクトボックス */}
-                <select value={selectedEventId} onChange={this.changeEvent}>
+                <select value={selectedEventIndex} onChange={this.changeEvent}>
                     {events.map((event, index) =>
-                        <option key={event.id} value={event.id}>{event.title}</option>
+                        <option key={event.id} value={index}>{event.title}</option>
                     )}
                 </select>
 
