@@ -21,6 +21,11 @@ export default class Menu extends React.Component {
             <NavLink to="/login" className="menu-item">
                 ログアウト
             </NavLink>
+            <NavLink to="/bookRecommend" className="menu-item">
+                【test】推薦図書
+            </NavLink>
+            
+
         </nav>
         )
   }
