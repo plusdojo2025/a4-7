@@ -2,6 +2,7 @@ import React from 'react';
 import Menu from '../components/MenuHeader';
 import TaskHeader from '../components/TaskHeader';
 import axios from 'axios';
+import './SchedulePage.css';
 
 export default class SchedulePage extends React.Component {
     constructor(props) {
@@ -167,6 +168,7 @@ export default class SchedulePage extends React.Component {
         });
 
     };
+    
 
 
 
@@ -211,7 +213,7 @@ export default class SchedulePage extends React.Component {
                 </div>
 
                 {/* 私用・宿題の予定表 */}
-                <table>
+                <table id="scheduleTable">
                     <thead>
                         <tr>
                             <th>日付</th>
