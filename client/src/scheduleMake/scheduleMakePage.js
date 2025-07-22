@@ -5,6 +5,8 @@ export default class ScheduleMakePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            // ユーザーIDを追加
+            usersId: this.props.usersId || 1, // propsから取得、なければデフォルト値
             // 休暇期間の設定
             vacationStart: '2025-07-20',
             vacationEnd: '2025-08-31',
@@ -41,6 +43,33 @@ export default class ScheduleMakePage extends React.Component {
             ]
         };
     }
+
+ // データ保存
+handleSave = async () => {
+    const saveData = {
+        userId: this.state.usersId,
+        vacationName: this.state.selectedVacation,
+        startDate: this.state.vacationStart,
+        endDate: this.state.vacationEnd,
+    };
+    
+    try {
+        const response = await fetch('/api/vacations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(saveData)
+        });
+        
+        if (!response.ok) {
+            console.error('保存失敗:', response.status);
+        }
+    } catch (error) {
+        console.error('保存エラー:', error);
+    }
+}
+
     //休暇の種類が変更されたときに日付を自動設定の処理
     handleVacationChange = (event) => {
         const selectedVacation = this.state.vacations.find(v => v.name === event.target.value);
@@ -302,7 +331,7 @@ export default class ScheduleMakePage extends React.Component {
                 </div>
 
                 <div>
-                    <button>決定</button>
+                    <button onClick={this.handleSave}>決定</button>
                 </div>
             </div>
         );

@@ -1,6 +1,6 @@
 package com.example.demo.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +22,7 @@ public class Vacations {
 	private Integer id;
 	private Integer userId;
 	private String vacationName;
-	private Date startDate;
-	private Date endDate;
+	private LocalDate startDate;
+	private LocalDate endDate;
+	private LocalDate decisionDate;
 }

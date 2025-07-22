@@ -44,3 +44,11 @@ html, body, #root {
   width: 100%;
 }
 
+/* 豆知識 | ロゴ画像 | 今日のタスク一覧 */
+#header {   
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  list-style: none;
+}

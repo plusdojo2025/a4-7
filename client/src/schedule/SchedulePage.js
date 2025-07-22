@@ -1,60 +1,70 @@
 import React from 'react';
 import Menu from '../components/MenuHeader';
+import TaskHeader from '../components/TaskHeader';
 import axios from 'axios';
+import './SchedulePage.css';
 
 export default class SchedulePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            vacationStart: '2023-07-20',
-            vacationEnd: '2023-08-31',
+            vacationStart: '2025-07-19',
+            vacationEnd: '2025-08-31',
             vacations: [
-                { name: '夏休み', start: '2023-07-20', end: '2023-08-31' },
+                { name: '夏休み', start: '2025-07-19', end: '2025-08-31' },
                 { name: '冬休み', start: '2023-12-20', end: '2024-01-10' },
                 { name: '春休み', start: '2024-03-20', end: '2024-04-05' }
             ],
-            privateSchedules: [
-                { date: '2023-07-21', event: '海の日' },
-                { date: '2023-08-01', event: '花火大会' },
-                { date: '2023-08-15', event: 'お盆休み' }
-            ],
-            hwSchedulesList: [
-                {name: "算数ドリル", contents: [
-                    { date: "2023-07-22", content: "ページ1-10を解く", checked: true },
-                    { date: "2023-07-22", content: "ページ11-20を解く", checked: false }, 
-                    { date: "2023-07-24", content: "ページ21-30を解く", checked: false }
-                ]},
-                {name: "理科ドリル", contents: [
-                    { date: "2023-07-24", content: "植物の成長について調べる", checked: false },
-                    { date: "2023-07-25", content: "動物の生態について調べる", checked: false }
-                ]},
-                {name: "国語ドリル", contents: [
-                    { date: "2023-07-24", content: "漢字の練習", checked: false },
-                    { date: "2023-07-25", content: "読解問題を解く", checked: false }
-                ]}
-            ], 
+            privateSchedules: [],
+            columns: [],
+            hwSchedules: [],
             showModal: false,
             selectedHwContents: [],
             selectedHwDate: '',
             dragData: null, 
-            today: "2023-07-24"
+            today: "2025-07-21",
+            userId: 1,
+            vacationId: 1
         };
     }
 
+    // TODO: 複数fetchをまとめて実行する方法を検討
     componentDidMount() {
+
         // 初期化やデータの取得などの処理をここに記述
-        axios.get("/privateSchedules/", {params: {
-            userId: 1,
-            vacationId: 1
-        }
-        })
+        // axios.get("/privateSchedules/", {params: {
+        //     userId: 1,
+        //     vacationId: 1
+        // }
+        // })
+        fetch("/privateSchedules/?userId="+this.state.userId+"&vacationId="+this.state.vacationId) // TODO: 上行のaxiosがうまくいかない
+        .then(response => {return response.json()})
         .then (json => {
-            console.log(json);
+            console.log(json);  
             this.setState({
-                //privateSchedules: json
+                privateSchedules: json
+            });
+        });
+
+        fetch("/columns/?userId="+this.state.userId+"&vacationId="+this.state.vacationId)
+        .then(response => {return response.json()})
+        .then (json => {
+            console.log(json);  
+            this.setState({
+                columns: json
+            });
+        });
+        fetch("/homeworkSchedules/?userId="+this.state.userId+"&vacationId="+this.state.vacationId)
+        .then(response => {return response.json()})
+        .then (json => {
+            console.log(json);  
+            this.setState({
+                hwSchedules: json
             });
         });
     }
+
+    
 
     handleVacationChange = (event) => {
         const selectedVacation = this.state.vacations.find(v => v.name === event.target.value);
@@ -79,12 +89,42 @@ export default class SchedulePage extends React.Component {
         return dateRange;
     }
 
-    editPrivateSchedule = (event) => {
-        // axios使ってjsonをsetStateする
+    psInput = (event, idx) => {
+        // 私用の予定を入力する処理
+        const updatedPrivateSchedule = this.state.privateSchedules[idx];
+        updatedPrivateSchedule.content = event.target.value; // 入力された内容を更新
+
+        this.setState(prevState => {
+            const updatedPrivateSchedules = [...prevState.privateSchedules];
+            updatedPrivateSchedules[idx] = updatedPrivateSchedule; // 更新された予定をセット
+            return { privateSchedules: updatedPrivateSchedules };
+        });
     }
 
-    handleCheckboxChange = (hw, hwIndex, content, contentIndex) => {
+    editPrivateSchedule = (idx) => {
+        // axios使ってjsonをsetStateする
+        // 更新なのでID(modId)を含めて送信する必要がある。
+        const updatedPsSchedule = this.state.privateSchedules[idx];
+
+        // axiosを使って更新リクエストを送信
+        axios.post('/privateSchedules/mod/', updatedPsSchedule)
+        .then (json => {
+            console.log(json);
+            this.componentDidMount();
+        });
+
+    }
+
+    handleCheckboxChange = (event, content) => {
         // チェックボックスの状態を更新する処理
+        const updatedHwSchedule = content;
+        updatedHwSchedule.completed = event.target.checked; // チェック状態を更新
+        
+        axios.post('/homeworkSchedules/mod/', updatedHwSchedule)
+        .then (json => {
+            console.log(json);
+            this.componentDidMount();
+        });
     }
 
     openModal = (contents, date) => {
@@ -99,45 +139,65 @@ export default class SchedulePage extends React.Component {
         this.setState({ showModal: false });
     };
 
-    onDragStart = (hwIndex, date, contentIndex) => {
-        this.setState({ dragData: { hwIndex, date, contentIndex } });
+    onDragStart = (colIndex, date, contentIndex) => {
+        this.setState({ dragData: { colIndex, date, contentIndex } });
     };
 
     onDragOver = (e) => {
         e.preventDefault(); // ドロップを許可する
     };
 
-    onDrop = (hwIndex, date) => {
-        const { dragData, hwSchedulesList } = this.state;
+    onDrop = (colIndex, date) => {
+        const { dragData, hwSchedules } = this.state;
         if (!dragData) return;
 
-        const draggedItem = hwSchedulesList[dragData.hwIndex].contents[dragData.contentIndex];
+        const draggedItem = hwSchedules[dragData.contentIndex];
 
         // ドラッグした宿題と同じ列であることを確認
-        if (dragData.hwIndex !== hwIndex) return;
+        if (dragData.colIndex !== colIndex) return;
 
-        // 日付だけを変更
-        const updatedHwSchedulesList = [...hwSchedulesList];
-        updatedHwSchedulesList[hwIndex].contents[dragData.contentIndex] = {
-            content: draggedItem.content,
-            checked: draggedItem.checked,
-            date: date
+        const updatedHwSchedule = {            
+            ...draggedItem,
+            contentDate: date, // 日付だけを変更
         };
 
-        this.setState({
-            hwSchedulesList: updatedHwSchedulesList,
-            dragData: null
+        axios.post('/homeworkSchedules/mod/', updatedHwSchedule)
+        .then (json => {
+            console.log(json);
+            this.componentDidMount();
         });
+
     };
+    
 
 
 
     render() {
-        const { vacations, vacationStart, vacationEnd, privateSchedules, hwSchedulesList } = this.state;
+        const { 
+            vacations, 
+            vacationStart, 
+            vacationEnd, 
+            privateSchedules, 
+            columns, 
+            hwSchedules, 
+            showModal, 
+            selectedHwDate, 
+            selectedHwContents,
+            today
+        } = this.state;
         const dateRange = this.makeDateRange(vacationStart, vacationEnd);
         return (
             <div>
-                <h1>Schedule Page</h1>
+                <ul id='header'>
+                    <li><h3>豆知識</h3></li>
+                    <li><h1>Schedule Page</h1></li>
+                    <li>
+                        <TaskHeader 
+                            taskList={hwSchedules.filter(content => content.contentDate === today)}
+                            checkBoxChange={this.handleCheckboxChange}                     
+                        />
+                    </li>
+                </ul>
                 <Menu></Menu>
 
                 {/* 休暇の選択 および 新しい予定の作成ボタン */}
@@ -153,15 +213,16 @@ export default class SchedulePage extends React.Component {
                 </div>
 
                 {/* 私用・宿題の予定表 */}
-                <table>
+                <table id="scheduleTable">
                     <thead>
                         <tr>
                             <th>日付</th>
                             <th>曜日</th>
                             <th>予定</th>
-                            {hwSchedulesList.map((hw, index) => ( 
-                                <th key={index}>{hw.name}</th> // 宿題のカラム
+                            {columns.map((col, index) => ( 
+                                <th key={index}>{col.columnTitle}</th> // 宿題のカラム
                             ))}
+
                         </tr>
                     </thead>
                     <tbody>
@@ -171,59 +232,69 @@ export default class SchedulePage extends React.Component {
                                 <td>{date.dayOfWeek}</td>
 
                                 <td> {/* 私用の予定 */}
+                                    {/* <input type="text" key={index}/> */}
+                                    {/* TODO: DBにないdateの場合のテキスト入力欄を表示 */}
                                     {privateSchedules.map((event, idx) => {
-                                        return event.date===date.date ? (
-                                        <input type="text" key={idx} value={event.event} onChange={this.editPrivateSchedule} />
-                                    ):null;
+                                        return event.contentDate.split('T')[0]===date.date ? (
+                                        <input type="text" key={idx} value={event.content} 
+                                            onChange={(e)=>{this.psInput(e, idx)}} // 入力された内容を更新
+                                            onBlur={()=>{this.editPrivateSchedule(idx)}} // 入力が終わったらDBを更新
+                                        />
+                                        ):null
                                     })}
                                 </td>
 
-                                {hwSchedulesList.map((hw, hwIndex) => ( // 宿題の予定
-                                    <td key={hwIndex} 
+                                {columns.map((col, colIdx) => ( // 宿題の予定
+                                    <td key={colIdx} 
                                         onDragOver={this.onDragOver} 
-                                        onDrop={() => this.onDrop(hwIndex, date.date)}
+                                        onDrop={() => this.onDrop(colIdx, date.date)}
                                     >
-                                        {/*同じ曜日に2個以上の予定がある場合はまとめて数を表示し、数をクリックしたらモダールで詳細の予定が表示される*/}
-                                        {hw.contents.filter(content => content.date === date.date).length > 1 ? (
-                                            <span
-                                                // style={{ color: 'blue', cursor: 'pointer' }}
-                                                onClick={() =>
-                                                    this.openModal(
-                                                        hw.contents.filter(content => content.date === date.date),
-                                                        date.date
-                                                    )
-                                                }
-                                            >
-                                                {hw.contents.filter(content => content.date === date.date).length} 件の予定
-                                            </span>
-                                        ) : (
-                                            hw.contents.map((content, contentIndex) => {
-                                                return content.date === date.date ? (
-                                                    <div key={contentIndex} 
-                                                        draggable
-                                                        onDragStart={() => this.onDragStart(hwIndex, content.date, contentIndex)}
-                                                        style={{cursor: 'grab'}}
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={content.checked}
-                                                            onChange={() =>
-                                                                this.handleCheckboxChange(hw, hwIndex, content, contentIndex)
-                                                            }
-                                                        />
-                                                        {content.content}
-                                                    </div>
-                                                ): null;
+                                    
+                                        {
+                                            hwSchedules.filter(content => ((content.contentDate === date.date)&&(content.columnInfoId === col.id))).length > 1 ? (
+                                                // TODO: モーダルじゃなくて列挙する
+                                                // TODO: モーダル内の宿題のチェックボックスのDB反映
+                                                <span
+                                                    onClick={() =>
+                                                        this.openModal(
+                                                            hwSchedules.filter(content => ((content.contentDate === date.date)&&(content.columnInfoId === col.id))),
+                                                            date.date
+                                                        )
+                                                    }
+                                                >
+                                                    {hwSchedules.filter(content => ((content.contentDate === date.date)&&(content.columnInfoId === col.id))).length} 件の予定
+                                                </span>
+                                            ):(
+                                                hwSchedules.map((content, contentIndex) => {
+                                                    return ((content.contentDate === date.date)&&(content.columnInfoId === col.id)) ? (
+                                                        <div key={contentIndex} 
+                                                            draggable
+                                                            onDragStart={() => this.onDragStart(colIdx, content.contentDate, contentIndex)}
+                                                            style={{cursor: 'grab'}}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={content.completed}
+                                                                onChange={(e) =>
+                                                                    this.handleCheckboxChange(e, content)
+                                                                }
+                                                            />
+                                                            {content.content}
+                                                        </div>
+                                            ): null;
                                             })
-                                        )}
+                                        )                                               
+                                        }                                   
                                     </td>
                                 ))}
+
+                                
                             </tr>
                         ))}
                     </tbody>
                 </table>
 
-                {this.state.showModal && (
+                {showModal && (
                     <div
                         style={{
                             position: 'fixed',
@@ -248,9 +319,9 @@ export default class SchedulePage extends React.Component {
                                 maxWidth: '90%',
                             }}
                         >
-                            <h3>{this.state.selectedHwDate} の宿題</h3>
+                            <h3>{selectedHwDate} の宿題</h3>
                             <ul>
-                                {this.state.selectedHwContents.map((content, idx) => (
+                                {selectedHwContents.map((content, idx) => (
                                     <li key={idx}>
                                         <input
                                             type="checkbox"

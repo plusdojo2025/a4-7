@@ -1,0 +1,38 @@
+#event_page {
+    /* display: block; */
+}
+.container {
+    height: 150px;
+    width: 260px;
+    margin: 10px auto;
+}
+.post_content {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+    height: 130px;
+    padding: 5px;
+    text-align: center;
+}
+/*
+#content {
+    border: none;
+    height: 100%;
+    width: 100%;
+}
+*/
+.post_footer {
+    text-align: right;
+}
+.post_footer p {
+    margin: 5px;
+}
+#other .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+}
+#other .post_footer p {
+    display: inline-block;
+}
