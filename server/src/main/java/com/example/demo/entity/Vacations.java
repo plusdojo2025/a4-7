@@ -24,4 +24,5 @@ public class Vacations {
 	private String vacationName;
 	private LocalDate startDate;
 	private LocalDate endDate;
+	private LocalDate decisionDate;
 }
