@@ -1,0 +1,24 @@
+#event_page {
+    /* display: block; */
+}
+#container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 20px;
+    height: 150px;
+}
+.post_content {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+    height: 130px;
+    padding: 5px;
+    text-align: center;
+}
+.post_fotter {
+    text-align: right;
+}
+.post_fotter p{
+    display: inline-block;
+    margin: 5px;
+}
