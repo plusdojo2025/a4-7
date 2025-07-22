@@ -23,4 +23,14 @@ public class UserPostController {
 		List<UserPost> postList = repository.findByEventIdOrderByIdDesc(eventId);
 		return postList;
 	}
+	
+	// 選択中イベントのログインユーザーの投稿取得
+	@PostMapping("/api/myPost/")
+	public UserPost getMyPost(@RequestBody UserPost userPost) {
+		Integer eventId = userPost.getEventId();
+		Integer userId = userPost.getUserId();
+		UserPost myPost = repository.findByEventIdAndUserId(eventId, userId);
+		System.out.print(myPost);
+		return myPost;
+	}
 }

@@ -1,11 +1,10 @@
 #event_page {
     /* display: block; */
 }
-#container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 20px;
+.container {
     height: 150px;
+    width: 260px;
+    margin: 10px auto;
 }
 .post_content {
     background-color: #ffffff;
@@ -15,10 +14,25 @@
     padding: 5px;
     text-align: center;
 }
-.post_fotter {
+/*
+#content {
+    border: none;
+    height: 100%;
+    width: 100%;
+}
+*/
+.post_footer {
     text-align: right;
 }
-.post_fotter p{
-    display: inline-block;
+.post_footer p {
     margin: 5px;
+}
+#other .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+}
+#other .post_footer p {
+    display: inline-block;
 }

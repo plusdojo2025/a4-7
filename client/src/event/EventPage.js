@@ -9,12 +9,14 @@ export default class EventPage extends React.Component {
         super(props);
         // state
         this.state = {
+            loginUserId: 1,             // ログインユーザーのid　仮で1とする！！！！！！！！！！！！
             events: [],                 // セレクトボックスに表示するイベント用配列
             selectedEventIndex: 0,      // 選択中イベントの配列の添え字
             selectedEventTheme: "",     // 選択中のイベントテーマ
             content: "",                // 投稿内容
             like: false,                // いいねのステータス　デフォルトはいいねしてない状態
             posts: [],                  // 他の人の投稿を格納する配列
+            myLikeCount: 0,             // ログインユーザーの投稿についたいいね数
         }
     }
 
@@ -31,13 +33,26 @@ export default class EventPage extends React.Component {
                 selectedEventTheme: selectedEvent.theme     // 選択中イベントテーマ
             })
 
+            const data = {
+                eventId: selectedEvent.id,          // 選択中イベントid
+                userId: this.state.loginUserId      // ログインユーザーのid
+            };
             // 選択中イベントの全投稿取得
-            const data = {eventId: selectedEvent.id};       // 選択中イベントid
             axios.post("/api/postList/", data)
             .then(response => {
                 console.log(response.data);
                 this.setState({
                     posts: response.data                    // 選択中イベントの全投稿
+                });
+            })
+
+            // ログインユーザーの投稿取得
+            axios.post("/api/myPost/", data)
+            .then(response => {
+                console.log(response.data);
+                this.setState({
+                    content: response.data.content,         // 投稿内容
+                    myLikeCount: response.data.count        // 投稿についたいいね数
                 });
             })
         });
@@ -61,11 +76,6 @@ export default class EventPage extends React.Component {
                 posts: response.data                    // 選択中イベントの全投稿
             });
         })
-
-        setTimeout(() => {
-            // ほんの少し待ってから反映後の状態を見る
-            console.log('→' + this.state.selectedEventIndex);
-        }, 0);
     }
 
     // 入力時にstate更新
@@ -90,16 +100,13 @@ export default class EventPage extends React.Component {
         this.setState({
             like: !like
         });
-        setTimeout(() => {
-            // ほんの少し待ってから反映後の状態を見る
-            console.log('→' + this.state.like);
-        }, 0);
     }
 
     render() {
-        const {events, selectedEventIndex, selectedEventTheme, content, posts} = this.state;
+        const {events, selectedEventIndex, selectedEventTheme, content, myLikeCount, posts} = this.state;
         return (
             <div id="event_page">
+                {/* メニューコンポーネント */}
                 <Menu></Menu>
 
                 {/* 表示イベント選択セレクトボックス　デフォルトは現在開催中のイベント */}
@@ -113,22 +120,29 @@ export default class EventPage extends React.Component {
                 <h2>お題：{selectedEventTheme}</h2>
 
                 {/* 投稿 */}
-                <div>
-                    <input type="text" name="content" placeholder="投稿内容" onChange={this.onInput} value={content}/>
-                    <button onClick={this.addMyPost}>投稿</button>
+                <div className="container">
+                    <div className="post_content">
+                        <input type="text" name="content" id="content" placeholder="投稿内容" onChange={this.onInput} value={content}/>
+                    </div>
+                    <div className="post_footer">
+                        {content
+                            ? <p>{myLikeCount}いいね</p>
+                            : <button onClick={this.addMyPost}>投稿</button>
+                        }
+                    </div>
                 </div>
                 
                 {/* 投稿一覧 */}
-                <div>
+                <div id="other">
                     <h3>他の人の投稿内容</h3>
 
-                    <div id="container">
+                    <div className="container">
                         {posts.map((post, index) =>
                             <div className="post">
                                 <div className="post_content">
                                     <p>{post.content}</p>
                                 </div>
-                                <div className="post_fotter">
+                                <div className="post_footer">
                                     <p>{post.count}</p>
                                     <button onClick={this.toggleLike}>いいね！</button>
                                 </div>
@@ -136,7 +150,6 @@ export default class EventPage extends React.Component {
                         )}
                     </div>
                 </div>
-
             </div>
         );
     }
