@@ -251,6 +251,8 @@ export default class SchedulePage extends React.Component {
                                     
                                         {
                                             hwSchedules.filter(content => ((content.contentDate === date.date)&&(content.columnInfoId === col.id))).length > 1 ? (
+                                                // TODO: モーダルじゃなくて列挙する
+                                                // TODO: モーダル内の宿題のチェックボックスのDB反映
                                                 <span
                                                     onClick={() =>
                                                         this.openModal(
