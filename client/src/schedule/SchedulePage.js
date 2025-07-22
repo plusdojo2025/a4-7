@@ -1,5 +1,6 @@
 import React from 'react';
 import Menu from '../components/MenuHeader';
+import TaskHeader from '../components/TaskHeader';
 import axios from 'axios';
 
 export default class SchedulePage extends React.Component {
@@ -13,35 +14,14 @@ export default class SchedulePage extends React.Component {
                 { name: '冬休み', start: '2023-12-20', end: '2024-01-10' },
                 { name: '春休み', start: '2024-03-20', end: '2024-04-05' }
             ],
-            privateSchedules: [
-                // { date: '2023-07-21', event: '海の日' },
-                // { date: '2023-08-01', event: '花火大会' },
-                // { date: '2023-08-15', event: 'お盆休み' }
-            ],
-
-            // hwSchedulesList: [
-            //     {name: "算数ドリル", contents: [
-            //         { date: "2025-07-22", content: "ページ1-10を解く", checked: true },
-            //         { date: "2025-07-22", content: "ページ11-20を解く", checked: false }, 
-            //         { date: "2025-07-24", content: "ページ21-30を解く", checked: false }
-            //     ]},
-            //     {name: "理科ドリル", contents: [
-            //         { date: "2025-07-24", content: "植物の成長について調べる", checked: false },
-            //         { date: "2025-07-25", content: "動物の生態について調べる", checked: false }
-            //     ]},
-            //     {name: "国語ドリル", contents: [
-            //         { date: "2025-07-24", content: "漢字の練習", checked: false },
-            //         { date: "2025-07-25", content: "読解問題を解く", checked: false }
-            //     ]}
-            // ], 
+            privateSchedules: [],
             columns: [],
             hwSchedules: [],
-
             showModal: false,
             selectedHwContents: [],
             selectedHwDate: '',
             dragData: null, 
-            today: "2025-07-24",
+            today: "2025-07-21",
             userId: 1,
             vacationId: 1
         };
@@ -82,6 +62,8 @@ export default class SchedulePage extends React.Component {
             });
         });
     }
+
+    
 
     handleVacationChange = (event) => {
         const selectedVacation = this.state.vacations.find(v => v.name === event.target.value);
@@ -132,9 +114,9 @@ export default class SchedulePage extends React.Component {
 
     }
 
-    handleCheckboxChange = (event, contentIndex) => {
+    handleCheckboxChange = (event, content) => {
         // チェックボックスの状態を更新する処理
-        const updatedHwSchedule = this.state.hwSchedules[contentIndex];
+        const updatedHwSchedule = content;
         updatedHwSchedule.completed = event.target.checked; // チェック状態を更新
         
         axios.post('/homeworkSchedules/mod/', updatedHwSchedule)
@@ -189,11 +171,31 @@ export default class SchedulePage extends React.Component {
 
 
     render() {
-        const { vacations, vacationStart, vacationEnd, privateSchedules, columns, hwSchedules } = this.state;
+        const { 
+            vacations, 
+            vacationStart, 
+            vacationEnd, 
+            privateSchedules, 
+            columns, 
+            hwSchedules, 
+            showModal, 
+            selectedHwDate, 
+            selectedHwContents,
+            today
+        } = this.state;
         const dateRange = this.makeDateRange(vacationStart, vacationEnd);
         return (
             <div>
-                <h1>Schedule Page</h1>
+                <ul id='header'>
+                    <li><h3>豆知識</h3></li>
+                    <li><h1>Schedule Page</h1></li>
+                    <li>
+                        <TaskHeader 
+                            taskList={hwSchedules.filter(content => content.contentDate === today)}
+                            checkBoxChange={this.handleCheckboxChange}                     
+                        />
+                    </li>
+                </ul>
                 <Menu></Menu>
 
                 {/* 休暇の選択 および 新しい予定の作成ボタン */}
@@ -215,9 +217,6 @@ export default class SchedulePage extends React.Component {
                             <th>日付</th>
                             <th>曜日</th>
                             <th>予定</th>
-                            {/* {hwSchedulesList.map((hw, index) => ( 
-                                <th key={index}>{hw.name}</th> // 宿題のカラム
-                            ))} */}
                             {columns.map((col, index) => ( 
                                 <th key={index}>{col.columnTitle}</th> // 宿題のカラム
                             ))}
@@ -275,7 +274,7 @@ export default class SchedulePage extends React.Component {
                                                                 type="checkbox"
                                                                 checked={content.completed}
                                                                 onChange={(e) =>
-                                                                    this.handleCheckboxChange(e, contentIndex)
+                                                                    this.handleCheckboxChange(e, content)
                                                                 }
                                                             />
                                                             {content.content}
@@ -293,7 +292,7 @@ export default class SchedulePage extends React.Component {
                     </tbody>
                 </table>
 
-                {this.state.showModal && (
+                {showModal && (
                     <div
                         style={{
                             position: 'fixed',
@@ -318,9 +317,9 @@ export default class SchedulePage extends React.Component {
                                 maxWidth: '90%',
                             }}
                         >
-                            <h3>{this.state.selectedHwDate} の宿題</h3>
+                            <h3>{selectedHwDate} の宿題</h3>
                             <ul>
-                                {this.state.selectedHwContents.map((content, idx) => (
+                                {selectedHwContents.map((content, idx) => (
                                     <li key={idx}>
                                         <input
                                             type="checkbox"
