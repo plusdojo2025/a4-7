@@ -16,9 +16,9 @@ public class BooksController {
 	
 	@GetMapping("/book/grade1/")
 	private List<Books> getG1(){
-		return repository.findByGrade(1);
+        return repository.findByGrade(1);
 	}
-	
+
 	@GetMapping("/book/grade2/")
 	private List<Books> getG2(){
 		return repository.findByGrade(2);

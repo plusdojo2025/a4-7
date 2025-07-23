@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React from "react";
 //import './BookRecommend.css';
 
 export default class BookRecommend extends React.Component{
@@ -15,7 +15,7 @@ export default class BookRecommend extends React.Component{
             author:"",
             overview:"",
             pages:"",
-            image:"",
+            ImageData:"",
             grade:"",
             showModal:false,
             isVisible1:false,
@@ -181,7 +181,7 @@ export default class BookRecommend extends React.Component{
                             <p>1年生向け</p>
                             {books1.map((book,index)=>
                                 <div>
-                                    <button onClick={()=>this.clickEvent1(index)}>{book.image}</button>
+                                     <button onClick={() => this.clickEvent1(index)}><img src="data:image/jpg;base64,${book.ImageData}"></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}
