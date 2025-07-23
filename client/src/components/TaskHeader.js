@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React from 'react';
+import './TaskHeader.css';
 
 export default class TaskHeader extends React.Component {
 
@@ -37,6 +38,7 @@ export default class TaskHeader extends React.Component {
         return (
         <div className="task-header">
             <h3>今日のタスク一覧</h3>
+            <div className="task-header-list">
             <ol>
                 {taskList.sort((a, b) => a.contentOrder - b.contentOrder).map((content, index) => (
                     <li key={index}>
@@ -49,6 +51,7 @@ export default class TaskHeader extends React.Component {
                     </li>
                 ))}
             </ol>
+            </div>
             <button onClick={()=>{this.rouletButtonClick(taskList)}}>ルーレット</button>
             
         </div>

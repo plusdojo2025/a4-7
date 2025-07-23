@@ -8,23 +8,27 @@ export default class SchedulePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            userId: 1, // TODO: ユーザIDを動的に取得する
-            today: "2025-07-21", // TODO: 今日の日付を動的に取得する
             // DBから取得するデータ
             vacations: [], 
             privateSchedules: [],
             columns: [],
             hwSchedules: [],
+
             // UIの状態
             showModal: false,
             selectedHwContents: [],
             selectedHwDate: '',
             dragData: null, 
             selectedVacationIdx: 0,
+            showModalDecide: false,
+            modalData: [],
+
+            // その他
+            userId: 1, // TODO: ユーザIDを動的に取得する
         };
     }
 
-    // TODO: 複数fetchをまとめて実行する方法を検討
+    // --------------------------------------------------------------
     componentDidMount() {
 
         const { selectedVacationIdx } = this.state;
@@ -36,6 +40,7 @@ export default class SchedulePage extends React.Component {
             this.setState({
                 vacations: json.data,
             }, () => {                
+                // TODO: 複数fetchをまとめて実行する方法を検討
                 // 休暇情報を取得した後に、選択された休暇の予定(私用・宿題)を取得
                 fetch("/privateSchedules/?userId="+this.state.userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
                 .then(response => {return response.json()})
@@ -54,6 +59,7 @@ export default class SchedulePage extends React.Component {
                         columns: json
                     });
                 });
+
                 fetch("/homeworkSchedules/?userId="+this.state.userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
                 .then(response => {return response.json()})
                 .then (json => {
@@ -67,32 +73,9 @@ export default class SchedulePage extends React.Component {
         })     
     }
 
-    
-
-    handleVacationChange = (event) => {
-        this.setState({
-            selectedVacationIdx: event.target.selectedIndex,
-        }, () => {
-            // 休暇が変更された後にデータを再取得
-            this.componentDidMount();
-        });
-    }
-
-    makeDateRange(start, end) {
-        // 開始日と終了日から日付と曜日の配列を作成
-        const startDate = new Date(start);
-        const endDate = new Date(end);
-        const dateRange = [];
-        for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
-            const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD形式
-            const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][date.getDay()];
-            dateRange.push({ date: formattedDate, dayOfWeek: dayOfWeek });
-        }
-        return dateRange;
-    }
-
+    // プライベート予定編集関連の関数-------------------------------------
+    // 私用の予定を入力する処理
     psInput = (event, idx) => {
-        // 私用の予定を入力する処理
         const updatedPrivateSchedule = this.state.privateSchedules[idx];
         updatedPrivateSchedule.content = event.target.value; // 入力された内容を更新
 
@@ -103,24 +86,31 @@ export default class SchedulePage extends React.Component {
         });
     }
 
+    // 編集した私用の予定をDBに保存する処理
     editPrivateSchedule = (idx) => {
-        // axios使ってjsonをsetStateする
-        // 更新なのでID(modId)を含めて送信する必要がある。
         const updatedPsSchedule = this.state.privateSchedules[idx];
 
-        // axiosを使って更新リクエストを送信
         axios.post('/privateSchedules/mod/', updatedPsSchedule)
         .then (json => {
             console.log(json);
             this.componentDidMount();
         });
-
     }
 
+    // 休暇選択----------------------------------------------------------
+    handleVacationChange = (event) => {
+        this.setState({
+            selectedVacationIdx: event.target.selectedIndex,
+        }, () => {
+            // 休暇が変更された後にデータを再取得
+            this.componentDidMount();
+        });
+    }
+
+    // 宿題タスクのチェックボックス--------------------------------------
     handleCheckboxChange = (event, content) => {
-        // チェックボックスの状態を更新する処理
         const updatedHwSchedule = content;
-        updatedHwSchedule.completed = event.target.checked; // チェック状態を更新
+        updatedHwSchedule.completed = event.target.checked;
         
         axios.post('/homeworkSchedules/mod/', updatedHwSchedule)
         .then (json => {
@@ -129,6 +119,7 @@ export default class SchedulePage extends React.Component {
         });
     }
 
+    // モーダル表示---------------------------------------------------------
     openModal = (contents, date) => {
         this.setState({
             showModal: true,
@@ -138,9 +129,10 @@ export default class SchedulePage extends React.Component {
     };
 
     closeModal = () => {
-        this.setState({ showModal: false });
+        this.setState({ showModal: false, showModalDecide: false });
     };
 
+    // 宿題タスクの移動処理 -------------------------------------------------
     onDragStart = (colIndex, date, contentIndex) => {
         this.setState({ dragData: { colIndex, date, contentIndex } });
     };
@@ -170,12 +162,27 @@ export default class SchedulePage extends React.Component {
         });
 
     };
-    
+
+    // --------------------------------------------------------------   
+    // 開始日と終了日から日付と曜日の配列を作成
+    makeDateRange(start, end) {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        const dateRange = [];
+        for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+            const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD形式
+            const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][date.getDay()];
+            dateRange.push({ date: formattedDate, dayOfWeek: dayOfWeek });
+        }
+        return dateRange;
+    }
 
     // 休暇の決定ボタンが押されたときの処理
     dicisionBotton = (date) => {
         const { selectedVacationIdx, vacations, hwSchedules} = this.state;
         const requests = [];
+        const modalData = [];
+        let sugorokuCount = 0;
 
         // 次の日付を決定する処理
         const nextDateTemp = new Date(date);
@@ -205,6 +212,7 @@ export default class SchedulePage extends React.Component {
                 axios.post('/homeworkSchedules/mod/', updatedContent)
                 .then (json => {console.log(json);})
             );
+            sugorokuCount++;
         });
 
         // 前日より前のチェックを外した宿題タスクを次の日に移行する
@@ -214,18 +222,39 @@ export default class SchedulePage extends React.Component {
                 axios.post('/homeworkSchedules/mod/', updatedContent)
                 .then (json => {console.log(json);})
             );
+            sugorokuCount--;
         });
 
-        // 今日以降のチェックされた宿題タスクをカウントして、モーダル表示準備(スゴロク・イベントと連携)
+        // 今日のチェックされた宿題タスクをカウント
+        hwSchedules.filter(content => content.contentDate === date && content.completed).forEach(_ => {
+            sugorokuCount++;
+        });
 
+        // モーダル表示準備
+        if (sugorokuCount >= 0) {
+            modalData.push(`${sugorokuCount}マス進みました`);
+        }
+        else{
+            modalData.push(`${-sugorokuCount}マス戻りました`);
+        }
+
+        modalData.push('背景〇〇をゲットしました'); // TODO
+        modalData.push('イベントで〇位でした'); // TODO
+        modalData.push('アバター〇〇をゲットしました'); // TODO
+        
         // すべてのaxiosリクエストが完了するのを待つ
         Promise.all(requests)
-            .then(() => {this.componentDidMount();})
-            .catch(error => {console.error("APIエラー:", error);});
+        .then(() => {
+            this.setState({
+                showModalDecide: true,
+                modalData: modalData
+            });
+            this.componentDidMount();
+        })
+        .catch(error => {console.error("APIエラー:", error);});
     }
 
-
-
+    // main -----------------------------------------------------------   
     render() {
         const { 
             vacations, 
@@ -236,23 +265,24 @@ export default class SchedulePage extends React.Component {
             selectedHwDate, 
             selectedHwContents,
             selectedVacationIdx,
-            today
+            showModalDecide,
+            modalData
         } = this.state;
 
 
-        if (!vacations || vacations.length === 0) { // componentDidMount前、初ログイン時はvacationsが空
+        if (!vacations || vacations.length === 0) { // componentDidMount前および初ログイン時はvacationsが空
             return <div>休暇情報がありません。</div>;
         } 
         const dateRange = this.makeDateRange(vacations[selectedVacationIdx].startDate, vacations[selectedVacationIdx].endDate);
 
         return (
-            <div>
+            <div className='backgroundImage' style={{ backgroundImage: `url(/bg2.png)`}}>
                 <ul id='header'>
                     <li><h3>豆知識</h3></li>
                     <li><h1>Schedule Page</h1></li>
                     <li>
                         <TaskHeader 
-                            taskList={hwSchedules.filter(content => content.contentDate === today)}
+                            taskList={hwSchedules.filter(content => content.contentDate === vacations[selectedVacationIdx].decisionDate)}
                             checkBoxChange={this.handleCheckboxChange}                     
                         />
                     </li>
@@ -272,6 +302,7 @@ export default class SchedulePage extends React.Component {
                 </div>
 
                 {/* 私用・宿題の予定表 */}
+                <div id="scheduleContainer">
                 <table id="scheduleTable">
                     <thead>
                         <tr>
@@ -279,7 +310,7 @@ export default class SchedulePage extends React.Component {
                             <th>曜日</th>
                             <th>予定</th>
                             {columns.map((col, index) => ( 
-                                <th key={index}>{col.columnTitle}</th> // 宿題のカラム
+                                <th key={index}>{col.columnTitle}</th>
                             ))}
 
                         </tr>
@@ -290,7 +321,8 @@ export default class SchedulePage extends React.Component {
                                 <td>{date.date}</td>
                                 <td>{date.dayOfWeek}</td>
 
-                                <td> {/* 私用の予定 */}
+                                {/* 私用の予定 */}
+                                <td> 
                                     {/* TODO: DBにないdateの場合のテキスト入力欄を表示 */}
                                     {privateSchedules.map((event, idx) => {
                                         return event.contentDate.split('T')[0]===date.date ? (
@@ -302,7 +334,8 @@ export default class SchedulePage extends React.Component {
                                     })}
                                 </td>
 
-                                {columns.map((col, colIdx) => ( // 宿題の予定
+                                {/* 宿題の予定 */}
+                                {columns.map((col, colIdx) => (
                                     <td key={colIdx} 
                                         onDragOver={this.onDragOver} 
                                         onDrop={() => this.onDrop(colIdx, date.date)}
@@ -349,7 +382,7 @@ export default class SchedulePage extends React.Component {
 
                                 {
                                     vacations[selectedVacationIdx].decisionDate === date.date ? (
-                                        <td><button onClick={()=>{this.dicisionBotton(date.date)}}>決定</button></td>
+                                        <td><button onClick={()=>{this.dicisionBotton(date.date)}}>次の日へ</button></td>
                                     ) : null
                                 }
 
@@ -358,7 +391,9 @@ export default class SchedulePage extends React.Component {
                         ))}
                     </tbody>
                 </table>
+                </div>
 
+                {/* まとめて表示された複数タスクをモーダル表示 */}
                 {showModal && (
                     <div id='modal'>
                         <div id='modalContent'>
@@ -375,6 +410,18 @@ export default class SchedulePage extends React.Component {
                                     </li>
                                 ))}
                             </ul>
+                            <button onClick={this.closeModal}>閉じる</button>
+                        </div>
+                    </div>
+                )}
+
+                {/* 次の日に移行したときのモーダル表示 */}
+                {showModalDecide && (
+                    <div id='modal'>
+                        <div id='modalContent'>
+                            {modalData.map((message, idx) => (
+                                <p key={idx}>{message}</p>
+                            ))}
                             <button onClick={this.closeModal}>閉じる</button>
                         </div>
                     </div>

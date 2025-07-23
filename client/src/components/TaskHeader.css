@@ -1,0 +1,42 @@
+.task-header {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    border-bottom: 1px solid #ddd;
+    color: #333;
+}
+
+.task-header h3 {
+    margin: 0;
+    font-size: 30px;
+}
+
+.task-header-list {
+    display: flex;
+justify-content: center;
+}
+
+.task-header li{
+text-align: left;
+}
+
+.task-header button {
+    padding: 8px 12px;
+    margin: 10px 0 0 0;
+    font-size: 16px;
+    border-radius: 4px;    
+    cursor: pointer;
+}
+
+.task-header button:hover {
+    background-color: #e0e0e0;
+}
+.task-header button:active {
+    background-color: #d0d0d0;
+}
+.task-header button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
+}
+
+
