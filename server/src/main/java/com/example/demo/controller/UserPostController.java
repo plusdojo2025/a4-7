@@ -33,4 +33,12 @@ public class UserPostController {
 		System.out.print(myPost);
 		return myPost;
 	}
+	
+	// 投稿登録
+	@PostMapping("/api/post/")
+	public UserPost addMyPost(@RequestBody UserPost userPost) {
+		repository.save(userPost);
+		System.out.print(userPost);
+		return userPost;
+	}
 }

@@ -2,7 +2,6 @@
     /* display: block; */
 }
 .container {
-    height: 150px;
     width: 260px;
     margin: 10px auto;
 }
@@ -10,17 +9,19 @@
     background-color: #ffffff;
     color: #000000;
     border: 1px solid #000000;
-    height: 130px;
+    height: 140px;
     padding: 5px;
+    box-sizing: border-box;
     text-align: center;
 }
-/*
 #content {
+    padding: 0;
     border: none;
     height: 100%;
     width: 100%;
+    text-align: center;
+    resize: none;           /* サイズ変更不可 */
 }
-*/
 .post_footer {
     text-align: right;
 }

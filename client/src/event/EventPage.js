@@ -16,6 +16,7 @@ export default class EventPage extends React.Component {
             content: "",                // 投稿内容
             like: false,                // いいねのステータス　デフォルトはいいねしてない状態
             posts: [],                  // 他の人の投稿を格納する配列
+            isPosted: false,            // ログインユーザーの投稿状態　デフォルトは未投稿
             myLikeCount: 0,             // ログインユーザーの投稿についたいいね数
         }
     }
@@ -40,31 +41,36 @@ export default class EventPage extends React.Component {
             // 選択中イベントの全投稿取得
             axios.post("/api/postList/", data)
             .then(response => {
+                console.log("他のユーザーの投稿");
                 console.log(response.data);
                 this.setState({
                     posts: response.data                    // 選択中イベントの全投稿
                 });
             })
-
             // ログインユーザーの投稿取得
             axios.post("/api/myPost/", data)
             .then(response => {
-                console.log(response.data);
-                this.setState({
-                    content: response.data.content,         // 投稿内容
-                    myLikeCount: response.data.count        // 投稿についたいいね数
-                });
+                console.log("ログインユーザーの投稿");
+                // レスポンスの有無チェック
+                if (response.data != "") {          // レスポンスがある(=投稿済み)の場合
+                    console.log(response.data);
+                    this.setState({
+                        content: response.data.content,         // 投稿内容
+                        myLikeCount: response.data.count,       // 投稿についたいいね数
+                        isPosted: true                          // 投稿状態を投稿済みに
+                    });
+                }
             })
         });
     }
 
     // 表示イベント変更
     changeEvent = (e) => {
-        const {events} = this.state;
-        const targetIndex = e.target.value;
+        const {events} = this.state;            // stateのイベント配列取得
+        const targetIndex = e.target.value;     // セレクトボックスから選択された配列の添え字取得
         this.setState({
-            selectedEventIndex: targetIndex,
-            selectedEventTheme: events[targetIndex].theme
+            selectedEventIndex: targetIndex,                // 選択中イベントの配列の添え字
+            selectedEventTheme: events[targetIndex].theme   // 選択中イベントのテーマ
         });
 
         // 選択中イベントの全投稿取得
@@ -73,7 +79,7 @@ export default class EventPage extends React.Component {
         .then(response => {
             console.log(response.data);
             this.setState({
-                posts: response.data                    // 選択中イベントの全投稿
+                posts: response.data            // 選択中イベントの全投稿
             });
         })
     }
@@ -89,8 +95,26 @@ export default class EventPage extends React.Component {
 
     // 投稿内容登録
     addMyPost = () => {
-        const {content} = this.state;
-        console.log(content);
+        // 投稿確認ダイアログ表示　キャンセルの場合は登録処理をせずに返す
+        if (!window.confirm("投稿はイベントにつき1回だけできます。投稿しますか？")) {
+            return;
+        }
+
+        const {loginUserId, events, selectedEventIndex, myLikeCount, content} = this.state;     // stateから必要な情報取得
+        const userPost = {
+            eventId: events[selectedEventIndex].id,     // 選択中イベントのid
+            userId: loginUserId,                        // ログインユーザーid
+            content: content,                           // 入力された投稿内容
+            count: myLikeCount                          // いいね数　デフォルトの0
+        }
+        // 登録処理
+        axios.post("/api/post/", userPost)
+        .then(response => {
+            this.setState({
+                isPosted: true          // 投稿状態を投稿済みに
+            });
+            this.componentDidMount();   // 初期表示
+        })
     }
 
     // いいね
@@ -103,7 +127,7 @@ export default class EventPage extends React.Component {
     }
 
     render() {
-        const {events, selectedEventIndex, selectedEventTheme, content, myLikeCount, posts} = this.state;
+        const {events, selectedEventIndex, selectedEventTheme, content, myLikeCount, isPosted, posts} = this.state;
         return (
             <div id="event_page">
                 {/* メニューコンポーネント */}
@@ -122,10 +146,12 @@ export default class EventPage extends React.Component {
                 {/* 投稿 */}
                 <div className="container">
                     <div className="post_content">
-                        <input type="text" name="content" id="content" placeholder="投稿内容" onChange={this.onInput} value={content}/>
+                        {/* disabled属性で投稿済みの場合は変更不可に */}
+                        <textarea name="content" id="content" placeholder="投稿内容" onChange={this.onInput} value={content} disabled={isPosted}/>
                     </div>
                     <div className="post_footer">
-                        {content
+                        {/* ログインユーザーが投稿済みの場合はいいね数、未投稿の場合は投稿ボタン表示 */}
+                        {isPosted
                             ? <p>{myLikeCount}いいね</p>
                             : <button onClick={this.addMyPost}>投稿</button>
                         }
