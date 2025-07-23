@@ -133,17 +133,46 @@ export default class SchedulePage extends React.Component {
     };
 
     // 宿題タスクの移動処理 -------------------------------------------------
+
+    // ドラッグ開始時の処理
     onDragStart = (colIndex, date, contentIndex) => {
         this.setState({ dragData: { colIndex, date, contentIndex } });
     };
 
-    onDragOver = (e) => {
+    onDragOver = (e, colIndex) => {
         e.preventDefault(); // ドロップを許可する
+        const { dragData } = this.state;
+        if (!dragData) return;
+
+        if (dragData.colIndex === colIndex) {
+            e.dataTransfer.dropEffect = 'move';
+        } else {
+            e.dataTransfer.dropEffect = 'none'; // cursor: no-dropにするため
+        }
     };
 
+    // ドロップゾーンにドラッグが入ったときの処理
+    onDragEnter = (e, colIndex) => {
+        const { dragData } = this.state;
+        const dropable = dragData && dragData.colIndex === colIndex;
+        const dropZone = e.currentTarget;
+
+        dropZone.classList.add(dropable ? 'dropable' : 'undropable');
+    };
+
+    // ドロップゾーンからドラッグが離れたときの処理
+    onDragLeave = (e) => {
+        const dropZone = e.currentTarget;
+        dropZone.classList.remove('dropable', 'undropable');
+    };
+    
+    
     onDrop = (colIndex, date) => {
         const { dragData, hwSchedules } = this.state;
         if (!dragData) return;
+
+        const dropZone = document.querySelectorAll('.drop-zone');
+        dropZone.forEach(el => el.classList.remove('dropable', 'undropable'));
 
         const draggedItem = hwSchedules[dragData.contentIndex];
 
@@ -337,7 +366,10 @@ export default class SchedulePage extends React.Component {
                                 {/* 宿題の予定 */}
                                 {columns.map((col, colIdx) => (
                                     <td key={colIdx} 
-                                        onDragOver={this.onDragOver} 
+                                        className="drop-zone"
+                                        onDragOver={(e)=> this.onDragOver(e, colIdx)} 
+                                        onDragEnter={(e) => this.onDragEnter(e, colIdx)}
+                                        onDragLeave={this.onDragLeave}
                                         onDrop={() => this.onDrop(colIdx, date.date)}
                                     >
                                     
@@ -360,9 +392,9 @@ export default class SchedulePage extends React.Component {
                                                 hwSchedules.map((content, contentIndex) => {
                                                     return ((content.contentDate === date.date)&&(content.columnInfoId === col.id)) ? (
                                                         <div key={contentIndex} 
+                                                            className="draggable"
                                                             draggable
                                                             onDragStart={() => this.onDragStart(colIdx, content.contentDate, contentIndex)}
-                                                            style={{cursor: 'grab'}}
                                                         >
                                                             <input
                                                                 type="checkbox"

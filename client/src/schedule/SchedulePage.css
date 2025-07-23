@@ -75,3 +75,19 @@ select {
     width: 100%;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
+
+.draggable {
+    cursor: grab;
+}
+
+.drop-zone.dropable {
+    background-color: #e0ffe0;
+    border-color: #4CAF50;
+}
+
+.drop-zone.undropable {
+    background-color: #ffe0e0;
+    border-color: #f44336;
+    /* cursor: no-drop; */ 
+    /* corsorはdataTransfer.dropEffectで制御 */
+}
