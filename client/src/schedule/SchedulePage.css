@@ -38,3 +38,27 @@ select {
     border-radius: 4px;
     /* background-color: rgba(255, 255, 255, 0.0); */
 }
+
+#modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明の背景 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* モーダルが最前面に表示されるように */
+}
+
+/* モーダルコンテンツのスタイル */
+#modalContent {
+    background-color: white;
+    color: black;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}

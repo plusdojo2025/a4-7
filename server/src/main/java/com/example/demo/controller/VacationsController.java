@@ -37,7 +37,7 @@ public class VacationsController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Vacations>> getVacationsByUserId(@PathVariable("userId") Integer userId) {
         try {
-            List<Vacations> vacations = vacationsRepository.findByUserId(userId);
+            List<Vacations> vacations = vacationsRepository.findByUserIdOrderByStartDateDesc(userId);
             return new ResponseEntity<>(vacations, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

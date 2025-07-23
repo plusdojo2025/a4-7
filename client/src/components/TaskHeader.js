@@ -31,6 +31,9 @@ export default class TaskHeader extends React.Component {
 
     render() {
         const { taskList } = this.props;
+        if (!taskList || taskList.length === 0) {
+            return <div><h3>今日のタスク一覧</h3>タスクなし</div>;
+        }
         return (
         <div className="task-header">
             <h3>今日のタスク一覧</h3>

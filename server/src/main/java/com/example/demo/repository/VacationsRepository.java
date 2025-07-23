@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.demo.entity.Vacations;
 
 public interface VacationsRepository extends JpaRepository<Vacations, Integer> {
-	List<Vacations> findByUserId(Integer userId);
+	List<Vacations> findByUserIdOrderByStartDateDesc(Integer userId);
 }

@@ -8,72 +8,74 @@ export default class SchedulePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            vacationStart: '2025-07-19',
-            vacationEnd: '2025-08-31',
-            vacations: [
-                { name: '夏休み', start: '2025-07-19', end: '2025-08-31' },
-                { name: '冬休み', start: '2023-12-20', end: '2024-01-10' },
-                { name: '春休み', start: '2024-03-20', end: '2024-04-05' }
-            ],
+            userId: 1, // TODO: ユーザIDを動的に取得する
+            today: "2025-07-21", // TODO: 今日の日付を動的に取得する
+            // DBから取得するデータ
+            vacations: [], 
             privateSchedules: [],
             columns: [],
             hwSchedules: [],
+            // UIの状態
             showModal: false,
             selectedHwContents: [],
             selectedHwDate: '',
             dragData: null, 
-            today: "2025-07-21",
-            userId: 1,
-            vacationId: 1
+            selectedVacationIdx: 0,
         };
     }
 
     // TODO: 複数fetchをまとめて実行する方法を検討
     componentDidMount() {
 
-        // 初期化やデータの取得などの処理をここに記述
-        // axios.get("/privateSchedules/", {params: {
-        //     userId: 1,
-        //     vacationId: 1
-        // }
-        // })
-        fetch("/privateSchedules/?userId="+this.state.userId+"&vacationId="+this.state.vacationId) // TODO: 上行のaxiosがうまくいかない
-        .then(response => {return response.json()})
-        .then (json => {
-            console.log(json);  
-            this.setState({
-                privateSchedules: json
-            });
-        });
+        const { selectedVacationIdx } = this.state;
 
-        fetch("/columns/?userId="+this.state.userId+"&vacationId="+this.state.vacationId)
-        .then(response => {return response.json()})
-        .then (json => {
-            console.log(json);  
+        // まずは休暇情報を取得
+        axios.get('/api/vacations/user/' + this.state.userId)
+        .then(json => {
+            console.log(json.data);
             this.setState({
-                columns: json
-            });
-        });
-        fetch("/homeworkSchedules/?userId="+this.state.userId+"&vacationId="+this.state.vacationId)
-        .then(response => {return response.json()})
-        .then (json => {
-            console.log(json);  
-            this.setState({
-                hwSchedules: json
-            });
-        });
+                vacations: json.data,
+            }, () => {                
+                // 休暇情報を取得した後に、選択された休暇の予定(私用・宿題)を取得
+                fetch("/privateSchedules/?userId="+this.state.userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
+                .then(response => {return response.json()})
+                .then (json => {
+                    console.log(json);  
+                    this.setState({
+                        privateSchedules: json
+                    });
+                });
+                
+                fetch("/columns/?userId="+this.state.userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
+                .then(response => {return response.json()})
+                .then (json => {
+                    console.log(json);  
+                    this.setState({
+                        columns: json
+                    });
+                });
+                fetch("/homeworkSchedules/?userId="+this.state.userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
+                .then(response => {return response.json()})
+                .then (json => {
+                    console.log(json);  
+                    this.setState({
+                        hwSchedules: json
+                    });
+                });
+            }
+            );
+        })     
     }
 
     
 
     handleVacationChange = (event) => {
-        const selectedVacation = this.state.vacations.find(v => v.name === event.target.value);
-        if (selectedVacation) {
-            this.setState({
-                vacationStart: selectedVacation.start,
-                vacationEnd: selectedVacation.end
-            });
-        }
+        this.setState({
+            selectedVacationIdx: event.target.selectedIndex,
+        }, () => {
+            // 休暇が変更された後にデータを再取得
+            this.componentDidMount();
+        });
     }
 
     makeDateRange(start, end) {
@@ -175,17 +177,22 @@ export default class SchedulePage extends React.Component {
     render() {
         const { 
             vacations, 
-            vacationStart, 
-            vacationEnd, 
             privateSchedules, 
             columns, 
             hwSchedules, 
             showModal, 
             selectedHwDate, 
             selectedHwContents,
+            selectedVacationIdx,
             today
         } = this.state;
-        const dateRange = this.makeDateRange(vacationStart, vacationEnd);
+
+
+        if (!vacations || vacations.length === 0) { // componentDidMount前、初ログイン時はvacationsが空
+            return <div>休暇情報がありません。</div>;
+        } 
+        const dateRange = this.makeDateRange(vacations[selectedVacationIdx].startDate, vacations[selectedVacationIdx].endDate);
+
         return (
             <div>
                 <ul id='header'>
@@ -204,8 +211,8 @@ export default class SchedulePage extends React.Component {
                 <div>
                     <select onChange={this.handleVacationChange}>
                         {vacations.map((vacation, index) => (
-                            <option value={vacation.name} key={index}>
-                                {vacation.name + ' (' + vacation.start + ' - ' + vacation.end + ')'}
+                            <option key={index}>
+                                {vacation.vacationName + ' (' + vacation.startDate + ' - ' + vacation.endDate + ')'}
                             </option>
                         ))}
                     </select>
@@ -295,30 +302,8 @@ export default class SchedulePage extends React.Component {
                 </table>
 
                 {showModal && (
-                    <div
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            zIndex: 1000,
-                        }}
-                    >
-                        <div
-                            style={{
-                                backgroundColor: 'white',
-                                color: 'black',
-                                padding: '20px',
-                                borderRadius: '5px',
-                                minWidth: '300px',
-                                maxWidth: '90%',
-                            }}
-                        >
+                    <div id='modal'>
+                        <div id='modalContent'>
                             <h3>{selectedHwDate} の宿題</h3>
                             <ul>
                                 {selectedHwContents.map((content, idx) => (
