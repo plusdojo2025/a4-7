@@ -57,4 +57,11 @@ public class VacationsController {
             return new ResponseEntity<>("保存に失敗しました", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    // 休暇情報を更新
+    @PostMapping("/mod/")
+    public Vacations mode(@RequestBody Vacations vacation){
+    	vacationsRepository.save(vacation);
+    	return vacation;    	
+    }
 }

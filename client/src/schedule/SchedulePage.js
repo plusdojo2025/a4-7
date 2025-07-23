@@ -172,6 +172,58 @@ export default class SchedulePage extends React.Component {
     };
     
 
+    // 休暇の決定ボタンが押されたときの処理
+    dicisionBotton = (date) => {
+        const { selectedVacationIdx, vacations, hwSchedules} = this.state;
+        const requests = [];
+
+        // 次の日付を決定する処理
+        const nextDateTemp = new Date(date);
+        nextDateTemp.setDate(nextDateTemp.getDate() + 1);
+        const nextDate = nextDateTemp.toISOString().split('T')[0]; // YYYY-MM-DD形式       
+
+        // 休暇テーブルの決定日(dicision_date)を次の日に移行         
+        const updatedVacation = { ...vacations[selectedVacationIdx], decisionDate: nextDate};
+        requests.push(
+            axios.post('/api/vacations/mod/', updatedVacation)
+            .then (json => {console.log(json);})
+        );
+
+        // チェックされていない今日の宿題タスクを次の日に移行する
+        hwSchedules.filter(content => content.contentDate === date && !content.completed).forEach(content => {
+            const updatedContent = { ...content, contentDate: nextDate };
+            requests.push(
+                axios.post('/homeworkSchedules/mod/', updatedContent)
+                .then (json => {console.log(json);})
+            );
+        });
+
+        // 前倒しでチェックされた宿題タスクを今日に移行する
+        hwSchedules.filter(content => content.contentDate > date && content.completed).forEach(content => {
+            const updatedContent = { ...content, contentDate: date };
+            requests.push(
+                axios.post('/homeworkSchedules/mod/', updatedContent)
+                .then (json => {console.log(json);})
+            );
+        });
+
+        // 前日より前のチェックを外した宿題タスクを次の日に移行する
+        hwSchedules.filter(content => content.contentDate < date && !content.completed).forEach(content => {
+            const updatedContent = { ...content, contentDate: nextDate};
+            requests.push(
+                axios.post('/homeworkSchedules/mod/', updatedContent)
+                .then (json => {console.log(json);})
+            );
+        });
+
+        // 今日以降のチェックされた宿題タスクをカウントして、モーダル表示準備(スゴロク・イベントと連携)
+
+        // すべてのaxiosリクエストが完了するのを待つ
+        Promise.all(requests)
+            .then(() => {this.componentDidMount();})
+            .catch(error => {console.error("APIエラー:", error);});
+    }
+
 
 
     render() {
@@ -239,7 +291,6 @@ export default class SchedulePage extends React.Component {
                                 <td>{date.dayOfWeek}</td>
 
                                 <td> {/* 私用の予定 */}
-                                    {/* <input type="text" key={index}/> */}
                                     {/* TODO: DBにないdateの場合のテキスト入力欄を表示 */}
                                     {privateSchedules.map((event, idx) => {
                                         return event.contentDate.split('T')[0]===date.date ? (
@@ -258,7 +309,8 @@ export default class SchedulePage extends React.Component {
                                     >
                                     
                                         {
-                                            hwSchedules.filter(content => ((content.contentDate === date.date)&&(content.columnInfoId === col.id))).length > 1 ? (
+                                            // hwSchedules.filter(content => ((content.contentDate === date.date)&&(content.columnInfoId === col.id))).length > 1 ? (
+                                            false ? (
                                                 // TODO: モーダルじゃなくて列挙する
                                                 // TODO: モーダル内の宿題のチェックボックスのDB反映
                                                 <span
@@ -294,6 +346,12 @@ export default class SchedulePage extends React.Component {
                                         }                                   
                                     </td>
                                 ))}
+
+                                {
+                                    vacations[selectedVacationIdx].decisionDate === date.date ? (
+                                        <td><button onClick={()=>{this.dicisionBotton(date.date)}}>決定</button></td>
+                                    ) : null
+                                }
 
                                 
                             </tr>
