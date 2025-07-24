@@ -36,21 +36,25 @@ export default class SchedulePage extends React.Component {
         const { selectedVacationIdx, userId} = this.state;
 
         // 背景画像の取得
-        axios.get('/users/' + userId)
-        .then(userRes => {
-            const backgroundId = userRes.data.backgroundId;
-            return axios.get('/backgrounds/' + backgroundId, {
-            // return axios.get('/backgrounds/7', {
-            responseType: 'blob'
-            });
-        })
-        .then(bgRes => {
-            const blob = bgRes.data;
-            const imageUrl = URL.createObjectURL(blob);
-            this.setState({
-                backgroundUrl: imageUrl
-            });
-        })
+            axios.get('/users/' + userId)
+            .then(userRes => {
+                const backgroundId = userRes.data.backgroundId;
+                return axios.get('/backgrounds/' + backgroundId, {
+                // return axios.get('/backgrounds/7', {
+                responseType: 'blob'
+                });
+            })
+            .then(bgRes => {
+                const blob = bgRes.data;
+                const imageUrl = URL.createObjectURL(blob);
+                this.setState({
+                    backgroundUrl: imageUrl
+                });
+            })
+            .catch(error => {
+                console.error('背景画像の取得に失敗しました:', error);
+            })
+        
 
 
         // まずは休暇情報を取得
@@ -326,10 +330,14 @@ export default class SchedulePage extends React.Component {
         const dateRange = this.makeDateRange(vacations[selectedVacationIdx].startDate, vacations[selectedVacationIdx].endDate);
 
         return (
-            <div className='backgroundImage' style={{ backgroundImage:`url(${backgroundUrl})`}}>
+            <div className='backgroundImage' style={
+                backgroundUrl
+                ? { backgroundImage: `url(${backgroundUrl})` }
+                : { backgroundColor: "#282c34" } // fallback 背景
+            }>
             {/* <div className='backgroundImage' style={{ backgroundImage:`url(bg2.png)`}}> */}
                 <ul id='header'>
-                    <li><TriviaHeader /></li>
+                    <li><TriviaHeader today={vacations[selectedVacationIdx].decisionDate}/></li>
                     <li><h1>Schedule Page</h1></li>
                     <li>
                         <TaskHeader 

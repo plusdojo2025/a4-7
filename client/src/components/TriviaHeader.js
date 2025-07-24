@@ -1,20 +1,32 @@
 import axios from 'axios';
 import React from 'react';
 import './TriviaHeader.css';
+import Avatar from './Avatar';
 
 export default class TriviaHeader extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            today: "2025-07-30",
+            // today: "2025-07-30",
+            today: props.today,
             trivia: ""
         };
     }
 
     componentDidMount = () => {
+        this.getTrivia(this.state.today);
+    }
+
+    componentDidUpdate(prevProps) {
+        // props.today が変わったときに再フェッチ
+        if (prevProps.today !== this.props.today) {
+            this.getTrivia(this.props.today);
+        }
+    }
+
+    getTrivia = (today) => {
         // 今日の日付から trivia を取得
-        const today = this.state.today;
         axios.get(`/api/trivias/${today}`)
             .then(json => {
                 this.setState({ trivia: json.data });
@@ -28,10 +40,10 @@ export default class TriviaHeader extends React.Component {
         const { trivia } = this.state;
         return (
             <div className="trivia-header">
-                <h3>今日の豆知識 </h3>
-                
-                    <p>{trivia ? trivia.content : "豆知識はまだありません。"}</p>
-              
+                <div className="trivia-content">
+                    <Avatar />
+                    <p className='balloon-008'>{trivia ? trivia.content : "豆知識はまだありません。"}</p>
+                </div>              
             </div>
         );
 

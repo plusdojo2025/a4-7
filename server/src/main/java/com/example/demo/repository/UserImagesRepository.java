@@ -8,4 +8,6 @@ import com.example.demo.entity.UserImages;
 
 public interface UserImagesRepository extends JpaRepository<UserImages, Integer> {
 	List<UserImages> findByUserId(Integer userId);
+	List<UserImages> findByUserIdAndImageType(Integer userId, String imageType);
+	
 }
