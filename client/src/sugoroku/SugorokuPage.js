@@ -22,43 +22,89 @@ const generateSpiralIndexes = (size) => {
   return spiral;
 };
 
+// SugorokuPage.js
 const SugorokuPage = () => {
-  // 仮の期間データ（API実装待ちのため）
-  const [periods, setPeriods] = useState([
-    { id: 1, name: "夏休み2025" },
-    { id: 2, name: "冬休み2025" },
-  ]);
+  const [periods, setPeriods] = useState([]);
   const [selectedPeriodKey, setSelectedPeriodKey] = useState(1);
+  const periodId = selectedPeriodKey;
 
-  // 宿題データ（選択期間の宿題）
+  const [background, setBackground] = useState(null);
   const [tasks, setTasks] = useState([]);
-
-  // ゲーム状態
   const [position, setPosition] = useState(0);
   const [message, setMessage] = useState("");
   const [unlockedBackgrounds, setUnlockedBackgrounds] = useState(["bg1.png"]);
   const [currentBackground, setCurrentBackground] = useState("bg1.png");
   const [showBgModal, setShowBgModal] = useState(false);
 
+  const periodBackgrounds = {
+    1: "natsu",
+    4: "fuyu",
+    5: "haru",
+  };
   // selectedPeriodKeyが変わったら宿題データを取得
-  useEffect(() => {
-  const userId = 1; // ←仮のユーザーID、必要ならpropsやcontextから取得してください
-  const vacationId = selectedPeriodKey;
+useEffect(() => {
+  if (selectedPeriodKey) {
+    axios.get(`/homeworkSchedules/?userId=1&vacationId=${selectedPeriodKey}`)
+      .then((res) => {
+        setTasks(res.data);
+        const completedCount = res.data.filter((task) => task.completed).length;
+        setPosition(completedCount);
+      })
+      .catch((err) => {
+        console.error("宿題取得エラー", err);
+      });
 
-  axios.get("/homeworkSchedules/", {
-    params: {
-      userId: userId,
-      vacationId: vacationId
-    }
-  })
+    // 季節ごとの初期背景を設定
+    let folder = "natsu"; // default 夏
+    if (selectedPeriodKey === 5) folder = "haru";
+    else if (selectedPeriodKey === 4) folder = "fuyu";
+    setUnlockedBackgrounds([`${folder}/0.png`]);
+    setCurrentBackground(`${folder}/0.png`);
+  }
+}, [selectedPeriodKey]);
+
+  useEffect(() => {
+  if (periodId) {
+    let folder = "natsu"; // デフォルトは夏
+
+    if (periodId === 5) folder = "haru";
+    else if (periodId === 4) folder = "fuyu";
+
+    // 初期背景は 0.png 固定
+    setBackground(`/${folder}/0.png`);
+  }
+}, [periodId]);
+
+
+ useEffect(() => {
+  const userId = 1;
+
+  axios.get(`http://localhost:8080/api/vacations/user/${userId}`)
     .then((res) => {
-      setTasks(res.data);
+      console.log("取得成功", res.data);
+      const formatted = res.data.map((v) => {
+        const start = new Date(v.startDate);
+        const end = new Date(v.endDate);
+
+        // 日付整形（例：2025年7月20日）
+        const formatDate = (date) =>
+          `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+
+        return {
+          id: v.id,
+          name: `${v.vacationName}（${formatDate(start)}〜${formatDate(end)}）`
+        };
+      });
+      setPeriods(formatted);
+      if (formatted.length > 0) {
+        setSelectedPeriodKey(formatted[0].id);
+      }
     })
     .catch((err) => {
-      console.error("宿題データ取得エラー", err);
-      setTasks([]);
+      console.error("休暇データ取得エラー", err);
+      setPeriods([]);
     });
-}, [selectedPeriodKey]);
+}, []);
 
 
   const taskCount = tasks.length;
@@ -73,36 +119,59 @@ const SugorokuPage = () => {
   ];
 
   const bgMap = {
-    [Math.floor(taskCount * 1 / 5)]: "bg2.png",
-    [Math.floor(taskCount * 2 / 5)]: "bg3.png",
-    [Math.floor(taskCount * 3 / 5)]: "bg4.png",
-    [Math.floor(taskCount * 4 / 5)]: "bg5.png",
+    [Math.floor(taskCount * 1 / 5)]: "1.png",
+    [Math.floor(taskCount * 2 / 5)]: "2.png",
+    [Math.floor(taskCount * 3 / 5)]: "3.png",
+    [Math.floor(taskCount * 4 / 5)]: "4.png",
   };
 
   const handleTreasureClick = (taskIndex) => {
-    if (position < taskIndex) return;
-    const bg = bgMap[taskIndex];
-    if (bg && !unlockedBackgrounds.includes(bg)) {
-      setUnlockedBackgrounds(prev => [...prev, bg]);
-      setCurrentBackground(bg);
-      setMessage("宝箱ゲット！🎉");
-      setTimeout(() => setMessage(""), 3000);
-    }
-    if (bg && position >= taskIndex) {
-      setShowBgModal(true);
-    }
-  };
+  if (position < taskIndex) return;
+
+  const bg = getRandomBackground();
+  if (!unlockedBackgrounds.includes(bg)) {
+    setUnlockedBackgrounds(prev => [...prev, bg]);
+    setCurrentBackground(bg);
+    setMessage("新しい背景を手に入れたよ！🎁");
+    setTimeout(() => setMessage(""), 3000);
+  } else {
+    setMessage("すでにゲットした背景だよ");
+    setTimeout(() => setMessage(""), 2000);
+  }
+
+  setShowBgModal(true);
+};
+
+  const getRandomBackground = () => {
+  let folder = "natsu";
+  if (selectedPeriodKey === 5) folder = "haru";
+  else if (selectedPeriodKey === 4) folder = "fuyu";
+
+  const randomIndex = Math.floor(Math.random() * 5); // 0〜4
+  return `${folder}/${randomIndex}.png`;
+};
+
 
   const handleMoveForward = () => {
-    setPosition(prev => {
-      const nextPos = Math.min(prev + 1, taskCount - 1);
-      if (nextPos === taskCount - 1) {
-        setMessage("ゴール！がんばったね🎉");
-        setTimeout(() => setMessage(""), 3000);
-      }
-      return nextPos;
-    });
-  };
+  setPosition(prev => {
+    const nextPos = prev + 1;
+    if (nextPos >= taskCount) {
+      return prev; // もう最後のマスなので進まない
+    }
+    // 次のタスクが完了しているかチェック
+    if (!tasks[nextPos]?.completed) {
+      setMessage("次の宿題を完了しないと進めません！");
+      setTimeout(() => setMessage(""), 3000);
+      return prev; // 進まない
+    }
+    if (nextPos === taskCount - 1) {
+      setMessage("ゴール！がんばったね🎉");
+      setTimeout(() => setMessage(""), 3000);
+    }
+    return nextPos;
+  });
+};
+
 
   const getArrow = (index) => {
     if (index >= taskCount - 1) return "";
@@ -254,7 +323,11 @@ const SugorokuPage = () => {
           borderRadius: "12px"
         }}>
           {spiral.flat().map((taskIndex, i) => (
-            <SugorokuCell key={i}>
+           <SugorokuCell
+  key={i}
+  isDone={taskIndex < position}  // ここで position に達しているか判定
+>
+
               {taskIndex < taskCount && (
                 <>
                   {position === taskIndex && <Avatar />}
