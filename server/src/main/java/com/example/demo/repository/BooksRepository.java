@@ -8,4 +8,6 @@ import com.example.demo.entity.Books;
 
 public interface BooksRepository extends JpaRepository<Books, Integer> {
 	List<Books> findByGrade(int grade);
+	Books findById(int id) ;
+		// TODO 自動生成されたメソッド・スタブ
 }
