@@ -1,6 +1,7 @@
 import React from 'react';
 import Menu from '../components/MenuHeader';
 import TaskHeader from '../components/TaskHeader';
+import TriviaHeader from '../components/TriviaHeader';
 import axios from 'axios';
 import './SchedulePage.css';
 
@@ -38,8 +39,8 @@ export default class SchedulePage extends React.Component {
         axios.get('/users/' + userId)
         .then(userRes => {
             const backgroundId = userRes.data.backgroundId;
-            // return axios.get('/backgrounds/' + backgroundId, {
-            return axios.get('/backgrounds/7', {
+            return axios.get('/backgrounds/' + backgroundId, {
+            // return axios.get('/backgrounds/7', {
             responseType: 'blob'
             });
         })
@@ -328,7 +329,7 @@ export default class SchedulePage extends React.Component {
             <div className='backgroundImage' style={{ backgroundImage:`url(${backgroundUrl})`}}>
             {/* <div className='backgroundImage' style={{ backgroundImage:`url(bg2.png)`}}> */}
                 <ul id='header'>
-                    <li><h3>豆知識</h3></li>
+                    <li><TriviaHeader /></li>
                     <li><h1>Schedule Page</h1></li>
                     <li>
                         <TaskHeader 
