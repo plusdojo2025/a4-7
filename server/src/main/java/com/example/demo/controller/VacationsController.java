@@ -46,16 +46,12 @@ public class VacationsController {
     
     // 新しい休暇情報を作成
     @PostMapping
-    public ResponseEntity<?> createVacation(@RequestBody Vacations vacation) {
-        try {
-            // IDを自動生成するためnullに設定
-            vacation.setId(null);
-            // データベースに保存
-            Vacations savedVacation = vacationsRepository.save(vacation);
-            return new ResponseEntity<>(savedVacation, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>("保存に失敗しました", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public Vacations createVacation(@RequestBody Vacations vacation) {
+        // IDを自動生成するためnullに設定
+        vacation.setId(null);
+        // データベースに保存
+        Vacations savedVacation = vacationsRepository.save(vacation);
+        return savedVacation;
     }
     
     // 休暇情報を更新

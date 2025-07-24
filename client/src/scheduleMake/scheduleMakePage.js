@@ -1,5 +1,9 @@
 import React from "react";
+import axios from "axios";
 import Menu from '../components/MenuHeader';
+import '../schedule/SchedulePage.css'; 
+import './ScheduleMakePage.css';
+import BookRecommend from "./BookRecommend"
 
 export default class ScheduleMakePage extends React.Component {
     constructor(props) {
@@ -9,7 +13,7 @@ export default class ScheduleMakePage extends React.Component {
             vacationStart: '2025-07-20',
             vacationEnd: '2025-08-31',
             selectedVacation: '夏休み',
-            vacationId: 1,
+            vacationId: 0,
             
             // 休暇の種類
             vacations: [
@@ -61,28 +65,28 @@ export default class ScheduleMakePage extends React.Component {
                     }
                 ],
                 '冬休み': [
-                    { 
-                        name: "冬休みの課題", 
-                        contents: [
-                            { date: '2025-12-27', content: 'ワーク 1～4', checked: false },
-                            { date: '2025-12-30', content: 'ワーク 6～8', checked: false },
-                            { date: '2026-01-04', content: 'ワーク 9～12', checked: false },
-                        ], 
-                        columnInfoId: 1,
-                        helpText: "学校で配られたワークを進めよう！1日2〜3ページずつ取り組むのがおすすめ！"
-                    }
+                    // { 
+                    //     name: "冬休みの課題", 
+                    //     contents: [
+                    //         { date: '2025-12-27', content: 'ワーク 1～4', checked: false },
+                    //         { date: '2025-12-30', content: 'ワーク 6～8', checked: false },
+                    //         { date: '2026-01-04', content: 'ワーク 9～12', checked: false },
+                    //     ], 
+                    //     columnInfoId: 1,
+                    //     helpText: "学校で配られたワークを進めよう！1日2〜3ページずつ取り組むのがおすすめ！"
+                    // }
                 ],
                 '春休み': [
-                    { 
-                        name: "春休みの課題", 
-                        contents: [
-                            { date: '2026-03-27', content: 'ワーク 1～4', checked: false },
-                            { date: '2026-03-30', content: 'ワーク 5～8', checked: false },
-                            { date: '2026-04-01', content: 'ワーク 9～12', checked: false },
-                        ], 
-                        columnInfoId: 1,
-                        helpText: "学校で配られたワークを進めよう！1日2〜3ページずつ取り組むのがおすすめ！"
-                    }
+                    // { 
+                    //     name: "春休みの課題", 
+                    //     contents: [
+                    //         { date: '2026-03-27', content: 'ワーク 1～4', checked: false },
+                    //         { date: '2026-03-30', content: 'ワーク 5～8', checked: false },
+                    //         { date: '2026-04-01', content: 'ワーク 9～12', checked: false },
+                    //     ], 
+                    //     columnInfoId: 1,
+                    //     helpText: "学校で配られたワークを進めよう！1日2〜3ページずつ取り組むのがおすすめ！"
+                    // }
                 ]
             },
             
@@ -96,17 +100,17 @@ export default class ScheduleMakePage extends React.Component {
             
             // 現在選択中の固定課題リスト
             fixedHwSchedulesList: [
-                { 
-                    name: "夏休みの宿題", 
-                    contents: [
-                        { date: '2025-07-22', content: 'ワーク 10～12', checked: false },
-                        { date: '2025-07-24', content: 'ワーク 13～15', checked: false },
-                        { date: '2025-08-04', content: 'ワーク 20～22', checked: false },
-                        { date: '2025-08-06', content: 'ワーク 24～25', checked: false }
-                    ], 
-                    columnInfoId: 1,
-                    helpText: "学校で配られたワークを進めよう！1日2〜3ページずつ取り組むのがおすすめ！"
-                },
+                // { 
+                //     name: "夏休みの宿題", 
+                //     contents: [
+                //         { date: '2025-07-22', content: 'ワーク 10～12', checked: false },
+                //         { date: '2025-07-24', content: 'ワーク 13～15', checked: false },
+                //         { date: '2025-08-04', content: 'ワーク 20～22', checked: false },
+                //         { date: '2025-08-06', content: 'ワーク 24～25', checked: false }
+                //     ], 
+                //     columnInfoId: 1,
+                //     helpText: "学校で配られたワークを進めよう！1日2〜3ページずつ取り組むのがおすすめ！"
+                // },
                 { 
                     name: "読書感想文", 
                     contents: [
@@ -119,7 +123,8 @@ export default class ScheduleMakePage extends React.Component {
                         { date: '2025-08-12', content: '清書', checked: false }
                     ], 
                     columnInfoId: 2,
-                    helpText: "気に入った本を読んで感想をまとめよう！詳しくはここをクリックしてね！"
+                    helpText: "気に入った本を読んで感想をまとめよう！詳しくはここをクリックしてね！",
+                    specialBookFlag: true
                 },
                 { 
                     name: "自由研究", 
@@ -131,18 +136,32 @@ export default class ScheduleMakePage extends React.Component {
                         { date: '2025-08-12', content: '調査のかんそう', checked: false }
                     ], 
                     columnInfoId: 3,
-                    helpText: "興味のあるテーマを選んで調べたり実験しよう！観察日記や実験記録をつけることが大切！"
+                    helpText: "興味のあるテーマを選んで調べたり実験しよう！観察日記や実験記録をつけることが大切！",
+                    specialBookFlag: false
                 }
             ],
             
             // 自由に追加できる課題
             additionalHwSchedulesList: [
-                { name: "計算ドリル", contents: [], columnInfoId: 4 }
+                { 
+                    name: "計算ドリル", 
+                    contents: [
+                            { date: '2025-07-22', content: 'ワーク 10～12', checked: false },
+                            { date: '2025-07-24', content: 'ワーク 13～15', checked: false },
+                            { date: '2025-08-04', content: 'ワーク 20～22', checked: false },
+                            { date: '2025-08-06', content: 'ワーク 24～25', checked: false }
+                    ], 
+                    columnInfoId: 4, 
+                    helpText: "学校で配られたワークを進めよう！1日2〜3ページずつ取り組むのがおすすめ！",
+                    specialBookFlag: false
+                 }
             ],
             
             nextColumnInfoId: 5,
             showHelpText: false,
-            currentHelpText: ""
+            currentHelpText: "",
+            currentHwContent: null,
+            showModal: false
         };
     }
 
@@ -165,26 +184,36 @@ export default class ScheduleMakePage extends React.Component {
         };
         
         try {
-            const response = await fetch('/api/vacations', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(saveData)
-            });
-            
-            if (!response.ok) {
-                console.error('休暇保存失敗:', response.status);
-                return;
-            }
+            // const response = await fetch('/api/vacations', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(saveData)
+            // });
+
+            axios.post('/api/vacations', saveData)
+            .then(json=>{
+                this.setState(
+                    {vacationId: json.data.id}, ()=>{
+                        this.savePrivateSchedules();
+                        this.saveColumns();
+                    }
+                );
+                return "hoge"
+            })          
+            .then(_=>{
+                window.location.href = '/'
+            })
+
         } catch (error) {
             console.error('休暇保存エラー:', error);
             return;
         }
 
-        // プライベート予定を保存
-        await this.savePrivateSchedules();
+        // // プライベート予定を保存
+        // await this.savePrivateSchedules();
         
-        // 宿題予定を保存
-        await this.saveHomeworkSchedules();
+        // // 宿題予定を保存
+        // await this.saveHomeworkSchedules();
     }
 
     // プライベート予定の保存
@@ -199,16 +228,16 @@ export default class ScheduleMakePage extends React.Component {
                 };
 
                 // 既存データがあるかチェック
-                const checkResponse = await fetch(`/privateSchedules/?userId=${this.state.usersId}&vacationId=${this.state.vacationId}`);
+                // const checkResponse = await fetch(`/privateSchedules/?userId=${this.state.usersId}&vacationId=${this.state.vacationId}`);
                 
-                if (checkResponse.ok) {
-                    const existingSchedules = await checkResponse.json();
-                    const existingSchedule = existingSchedules.find(s => s.contentDate === schedule.date);
+                // if (checkResponse.ok) {
+                //     const existingSchedules = await checkResponse.json();
+                //     const existingSchedule = existingSchedules.find(s => s.contentDate === schedule.date);
                     
-                    if (existingSchedule) {
-                        privateScheduleData.id = existingSchedule.id;
-                    }
-                }
+                //     if (existingSchedule) {
+                //         privateScheduleData.id = existingSchedule.id;
+                //     }
+                // }
 
                 const response = await fetch('/privateSchedules/mod/', {
                     method: 'POST',
@@ -223,20 +252,66 @@ export default class ScheduleMakePage extends React.Component {
         }
     }
 
-    // 宿題予定の保存
-    saveHomeworkSchedules = async () => {
-        // 固定課題を保存　　　
-        for (const hw of this.state.fixedHwSchedulesList) {
-            await this.saveEachHomework(hw);
-        }
-        
-        // 追加課題を保存
-        for (const hw of this.state.additionalHwSchedulesList) {
-            await this.saveEachHomework(hw);
-        }
-        
-        alert('予定が保存されました');
+    saveColumns = () => {
+        let columnsOrder = 0;
+
+        // 固定課題
+        this.state.fixedHwSchedulesList.map((hw, idx) => {
+            const columnsData = {
+                userId: this.state.usersId,
+                columnTitle: hw.name,
+                position: columnsOrder,
+                vacationId: this.state.vacationId
+            }
+
+            columnsOrder++;
+
+            axios.post(`/columns/save`, columnsData)
+            .then(json=>{
+                this.state.fixedHwSchedulesList[idx].columnInfoId = json.data.id
+                return this.state.fixedHwSchedulesList[idx]
+            })
+            .then(hwUpdated => {
+                this.saveEachHomework(hwUpdated);
+            })
+        })
+
+        // 追加課題
+        this.state.additionalHwSchedulesList.map((hw, idx) => {
+            const columnsData = {
+                userId: this.state.usersId,
+                columnTitle: hw.name,
+                position: columnsOrder,
+                vacationId: this.state.vacationId
+            }
+
+            columnsOrder++;
+
+            axios.post(`/columns/save`, columnsData)
+            .then(json=>{
+                this.state.additionalHwSchedulesList[idx].columnInfoId = json.data.id
+                return this.state.additionalHwSchedulesList[idx]
+            })
+            .then(hwUpdated => {
+                this.saveEachHomework(hwUpdated);
+            })
+        })
     }
+
+    // 宿題予定の保存
+    // saveHomeworkSchedules = async () => {
+    //     // 固定課題を保存　　　
+    //     for (const hw of this.state.fixedHwSchedulesList) {
+    //         await this.saveEachHomework(hw);
+    //     }
+        
+    //     // 追加課題を保存
+    //     for (const hw of this.state.additionalHwSchedulesList) {
+    //         await this.saveEachHomework(hw);
+    //     }
+        
+    //     alert('予定が保存されました');
+    // }
 
     // 各宿題の内容を保存
     saveEachHomework = async (homework) => {
@@ -252,6 +327,7 @@ export default class ScheduleMakePage extends React.Component {
                     vacationId: this.state.vacationId
                 };
 
+
                 const response = await fetch('/homeworkSchedules/mod/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -261,6 +337,8 @@ export default class ScheduleMakePage extends React.Component {
                 if (!response.ok) {
                     console.error('宿題予定保存失敗:', response.status);
                 }
+
+
             }
         }
     }
@@ -352,7 +430,9 @@ export default class ScheduleMakePage extends React.Component {
         newAdditionalHwSchedulesList.push({
             name: "",
             contents: [],
-            columnInfoId: this.state.nextColumnInfoId 
+            columnInfoId: this.state.nextColumnInfoId,
+            helpText: "学校で配られたワークを進めよう！1日2〜3ページずつ取り組むのがおすすめ！",
+            specialBookFlag: false
         });
         
         this.setState({ 
@@ -375,14 +455,24 @@ export default class ScheduleMakePage extends React.Component {
         this.setState({ additionalHwSchedulesList: newAdditionalHwSchedulesList });
     }
 
+    // // 課題補助を表示
+    // showHelpText = (helpText) => {
+    //     this.setState({ showHelpText: true, currentHelpText: helpText });
+    // }
+
+    // // 課題補助を消す
+    // hideHelpText = () => {
+    //     this.setState({ showHelpText: false, currentHelpText: "" });
+    // }
+
     // 課題補助を表示
-    showHelpText = (helpText) => {
-        this.setState({ showHelpText: true, currentHelpText: helpText });
+    showHelpText = (focusedHwContent) => {
+        this.setState({ showHelpText: true, currentHwContent: focusedHwContent });
     }
 
     // 課題補助を消す
     hideHelpText = () => {
-        this.setState({ showHelpText: false, currentHelpText: "" });
+        this.setState({ showHelpText: false, currentHelpText: null });
     }
 
     // 画面をクリックしたとき
@@ -414,6 +504,14 @@ export default class ScheduleMakePage extends React.Component {
         return content ? content.content : '';
     }
 
+    openModal = () => {
+        this.setState({showModal: true});
+    };
+
+    closeModal = () => {
+        this.setState({ showModal: false});
+    };
+
     render() {
         const { 
             vacations, 
@@ -423,7 +521,8 @@ export default class ScheduleMakePage extends React.Component {
             fixedHwSchedulesList,
             additionalHwSchedulesList,
             showHelpText,
-            currentHelpText
+            currentHelpText,
+            currentHwContent
         } = this.state;
         
         const dateRange = this.makeDateRange(vacationStart, vacationEnd);
@@ -433,13 +532,7 @@ export default class ScheduleMakePage extends React.Component {
                 <h1>予定作成</h1>
                 <Menu />
                 
-                {/* 課題補助 */}
-                {showHelpText && (
-                    <div>
-                        <strong>宿題ヒント：</strong>
-                        {currentHelpText}
-                    </div>
-                )}
+                
 
                 <div>
                     {/* 休暇選択 */}
@@ -470,14 +563,24 @@ export default class ScheduleMakePage extends React.Component {
                     </div>
                 </div>
 
-                {/* 課題追加ボタン */}
-                <div>
-                    <button onClick={this.addColumn}>＋</button>
-                </div>
+                {/* 課題補助 */}
+                {showHelpText && (
+                    <div className="hint">
+                        <strong>宿題ヒント：</strong>
+                        {/* {currentHelpText} */}
+                        {
+                            currentHwContent.specialBookFlag? (
+                                <span  onClick={this.openModal}>{currentHwContent.helpText}</span>
+
+                            ):<span>{currentHwContent.helpText}</span>
+                        }
+
+                    </div>
+                )}
 
                 {/* 予定表 */}
                 <div>
-                    <table>
+                    <table id="scheduleTable">
                         <thead>
                             <tr>
                                 <th>日付</th>
@@ -492,15 +595,24 @@ export default class ScheduleMakePage extends React.Component {
                                 {/* 追加課題の列 */}
                                 {additionalHwSchedulesList.map((hw, index) => (
                                     <th key={`additional-${index}`}>
+                                        <button onClick={() => this.deleteColumn(index)}>－</button>
+                                        <br />
                                         <input
                                             type="text"
                                             value={hw.name}
                                             onChange={(e) => this.handleAdditionalHwNameChange(index, e.target.value)}
+                                            className="addHwInput"
                                         />
-                                        <br />
-                                        <button onClick={() => this.deleteColumn(index)}>－</button>
+                                        
+                                        
                                     </th>
                                 ))}
+                                <th>
+                                    {/* 課題追加ボタン */}
+                                    <div>
+                                        <button onClick={this.addColumn}>＋</button>
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -526,8 +638,10 @@ export default class ScheduleMakePage extends React.Component {
                                                 data-fixed-hw="true"
                                                 value={this.getFixedHwContentForDate(hwIndex, date.date)}
                                                 onChange={(e) => this.handleFixedHwContentChange(hwIndex, date.date, e.target.value)}
-                                                onMouseEnter={() => this.showHelpText(hw.helpText)}
-                                                onFocus={() => this.showHelpText(hw.helpText)}
+                                                // onMouseEnter={() => this.showHelpText(hw.helpText)}
+                                                // onFocus={() => this.showHelpText(hw.helpText)}
+                                                onMouseEnter={() => this.showHelpText(hw)}
+                                                onFocus={() => this.showHelpText(hw)}
                                             />
                                         </td>
                                     ))}
@@ -540,6 +654,10 @@ export default class ScheduleMakePage extends React.Component {
                                                 placeholder="宿題内容を入力"
                                                 value={this.getAdditionalHwContentForDate(hwIndex, date.date)}
                                                 onChange={(e) => this.handleAdditionalHwContentChange(hwIndex, date.date, e.target.value)}
+                                                // onMouseEnter={() => this.showHelpText(hw.helpText)}
+                                                // onFocus={() => this.showHelpText(hw.helpText)}
+                                                onMouseEnter={() => this.showHelpText(hw)}
+                                                onFocus={() => this.showHelpText(hw)}
                                             />
                                         </td>
                                     ))}
@@ -552,6 +670,17 @@ export default class ScheduleMakePage extends React.Component {
                 <div>
                     <button onClick={this.handleSave}>決定</button>
                 </div>
+
+                <button onClick={this.openModal}>推薦図書</button>
+
+                {this.state.showModal && (
+                    <div id='modal'>
+                        <div id='modalContent'>
+                            <BookRecommend />
+                            <button onClick={this.closeModal}>閉じる</button>
+                        </div>
+                    </div>
+                )}  
             </div>
         );
     }
