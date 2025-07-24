@@ -13,6 +13,7 @@ export default class SchedulePage extends React.Component {
             privateSchedules: [],
             columns: [],
             hwSchedules: [],
+            backgroundUrl: '',
 
             // UIの状態
             showModal: false,
@@ -31,10 +32,28 @@ export default class SchedulePage extends React.Component {
     // --------------------------------------------------------------
     componentDidMount() {
 
-        const { selectedVacationIdx } = this.state;
+        const { selectedVacationIdx, userId} = this.state;
+
+        // 背景画像の取得
+        axios.get('/users/' + userId)
+        .then(userRes => {
+            const backgroundId = userRes.data.backgroundId;
+            // return axios.get('/backgrounds/' + backgroundId, {
+            return axios.get('/backgrounds/7', {
+            responseType: 'blob'
+            });
+        })
+        .then(bgRes => {
+            const blob = bgRes.data;
+            const imageUrl = URL.createObjectURL(blob);
+            this.setState({
+                backgroundUrl: imageUrl
+            });
+        })
+
 
         // まずは休暇情報を取得
-        axios.get('/api/vacations/user/' + this.state.userId)
+        axios.get('/api/vacations/user/' + userId)
         .then(json => {
             console.log(json.data);
             this.setState({
@@ -42,7 +61,7 @@ export default class SchedulePage extends React.Component {
             }, () => {                
                 // TODO: 複数fetchをまとめて実行する方法を検討
                 // 休暇情報を取得した後に、選択された休暇の予定(私用・宿題)を取得
-                fetch("/privateSchedules/?userId="+this.state.userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
+                fetch("/privateSchedules/?userId="+userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
                 .then(response => {return response.json()})
                 .then (json => {
                     console.log(json);  
@@ -51,7 +70,7 @@ export default class SchedulePage extends React.Component {
                     });
                 });
                 
-                fetch("/columns/?userId="+this.state.userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
+                fetch("/columns/?userId="+userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
                 .then(response => {return response.json()})
                 .then (json => {
                     console.log(json);  
@@ -60,7 +79,7 @@ export default class SchedulePage extends React.Component {
                     });
                 });
 
-                fetch("/homeworkSchedules/?userId="+this.state.userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
+                fetch("/homeworkSchedules/?userId="+userId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
                 .then(response => {return response.json()})
                 .then (json => {
                     console.log(json);  
@@ -295,6 +314,7 @@ export default class SchedulePage extends React.Component {
             selectedHwContents,
             selectedVacationIdx,
             showModalDecide,
+            backgroundUrl,
             modalData
         } = this.state;
 
@@ -305,7 +325,8 @@ export default class SchedulePage extends React.Component {
         const dateRange = this.makeDateRange(vacations[selectedVacationIdx].startDate, vacations[selectedVacationIdx].endDate);
 
         return (
-            <div className='backgroundImage' style={{ backgroundImage: `url(/bg2.png)`}}>
+            <div className='backgroundImage' style={{ backgroundImage:`url(${backgroundUrl})`}}>
+            {/* <div className='backgroundImage' style={{ backgroundImage:`url(bg2.png)`}}> */}
                 <ul id='header'>
                     <li><h3>豆知識</h3></li>
                     <li><h1>Schedule Page</h1></li>

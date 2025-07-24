@@ -5,6 +5,7 @@ import EventPage from './event/EventPage';
 import SugorokuPage from './sugoroku/SugorokuPage';
 import ScheduleMakePage from './scheduleMake/ScheduleMakePage';
 import BookRecommend from './scheduleMake/BookRecommend';
+import Test from './test/Test';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path='/sugoroku' element={<SugorokuPage />} />
             <Route path='/scheduleMake' element={<ScheduleMakePage />} />
             <Route path='/bookRecommend' element={<BookRecommend />} />
+            <Route path='/test' element={<Test />} />
           </Routes>
         </Router>
       </header>
