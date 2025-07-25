@@ -6,12 +6,35 @@ export default class Test extends React.Component {
     super(props);
     this.state = {
       inputId: '',
-      inputImage: null 
+      inputImage: null,
+      bgImgUrlImgIdList:[]
     };
     this.handleChangeId = this.handleChangeId.bind(this);
     this.handleChangeImage = this.handleChangeImage.bind(this);
     this.handleBookImageUpload = this.handleBookImageUpload.bind(this);
 }
+
+    componentDidMount () {
+        // avatar画像を全取得
+        axios.get('/backgrounds')
+        .then(json => {
+            const imageIdList = json.data.map(uImgs => uImgs.id);
+            return Promise.all( // 非同期の管理のためにPromiseを使用
+            imageIdList.map(imgId =>
+                axios.get('/backgrounds/' + imgId, { responseType: 'blob' })
+                .then(blob => [URL.createObjectURL(blob.data), imgId])
+            )
+            );
+        })
+        .then(imageUrl_imageIds => {
+            this.setState({
+            bgImgUrlImgIdList: imageUrl_imageIds
+            });
+        })
+        .catch(error => {
+            console.error('avatar画像の取得に失敗しました:', error);
+        });
+    }
 
 
 
@@ -90,11 +113,24 @@ async handleBookImageUpload(){
 
 
     render() {
+        const {bgImgUrlImgIdList} = this.state;
         return (
         <div>
             <h3>背景画像アップロード</h3>
             <input type="file" accept="image/*" multiple id='bgImageInput'/>
             <button onClick={this.handleBgImageUpload}>アップロード</button>
+
+            <div className="avatar-list">
+                  {bgImgUrlImgIdList.map((url_id, index) => (
+                    <img
+                      key={index}
+                      src={url_id[0]}
+                      alt={`アバター${index + 1}`}
+                      className="avatar"
+                      onClick={() => this.handleAvatarSelect(url_id[1])}
+                    />
+                  ))}
+            </div>
 
             <h3>アバター画像アップロード</h3>
             <input type="file" accept="image/*" multiple id='avatarImageInput'/>

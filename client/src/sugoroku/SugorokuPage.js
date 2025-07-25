@@ -29,16 +29,19 @@ const generateSpiralIndexes = (size) => {
 };
 
 const SugorokuPage = () => {
-  const [periods, setPeriods] = useState([]);
-  const [selectedPeriodKey, setSelectedPeriodKey] = useState("");
-  const [tasks, setTasks] = useState([]);
+  const [periods, setPeriods] = useState([]); // 休暇の選択に必要
+  const [selectedPeriodKey, setSelectedPeriodKey] = useState(""); // vacationIDのこと
+  // const [selectedPeriod, setSelectedPeriod] = useState(""); // vacationsのこと
+  const [tasks, setTasks] = useState([]); // 総マス数の計算に必要
+  const [completedTasks, setCompletedTasks] = useState([]); // 進めるマスの最大数の計算に必要
   const [position, setPosition] = useState(0); // 0がスタートマス
   const [message, setMessage] = useState("");
+  const [showBgModal, setShowBgModal] = useState(false);
+  const [userId, _] = useState(1);
+
   const [unlockedBackgrounds, setUnlockedBackgrounds] = useState(["natsu/0.png"]);
   const [currentBackground, setCurrentBackground] = useState("natsu/0.png");
-  const [showBgModal, setShowBgModal] = useState(false);
   const [openedTreasures, setOpenedTreasures] = useState([]);
-  const [completedTasks, setCompletedTasks] = useState([]);
 
   const backgroundMap = {
     1: { 1: "natsu/1.png", 2: "natsu/2.png", 3: "natsu/3.png", 4: "natsu/4.png" },
@@ -48,7 +51,7 @@ const SugorokuPage = () => {
 
   // 期間データ取得
   useEffect(() => {
-    axios.get(`/api/vacations/user/1`).then((res) => {
+    axios.get(`/api/vacations/user/${userId}`).then((res) => {
       const formatted = res.data.map((v) => {
         const start = new Date(v.startDate);
         const end = new Date(v.endDate);
@@ -59,7 +62,10 @@ const SugorokuPage = () => {
         };
       });
       setPeriods(formatted);
-      if (formatted.length > 0) setSelectedPeriodKey(formatted[0].id);
+      if (formatted.length > 0) {
+        setSelectedPeriodKey(formatted[0].id);
+        // setSelectedPeriod(formatted[0])
+      };
     });
   }, []);
 
@@ -85,19 +91,27 @@ const SugorokuPage = () => {
   }, [position, selectedPeriodKey]);
 
   // 選択期間が変わったらデータロード
+  // 選択した休暇での現在位置, 総マス数(タスクの数)、進める最大マス数(チェックされたタスクの数)をDBから持ってくる
   useEffect(() => {
     if (!selectedPeriodKey) return;
-    const savedPos = localStorage.getItem(`sugoroku_position_${selectedPeriodKey}`);
-    setPosition(savedPos !== null ? Number(savedPos) : 0);
+    // const savedPos = localStorage.getItem(`sugoroku_position_${selectedPeriodKey}`);
+    // setPosition(savedPos !== null ? Number(savedPos) : 0);
 
-    const savedTreasures = localStorage.getItem(`openedTreasures_${selectedPeriodKey}`);
-    setOpenedTreasures(savedTreasures ? JSON.parse(savedTreasures) : []);
+    // TODO: DBからselectedPeriodKeyを使って現在位置を受け取り、setPositionする
+    axios.get(`/api/vacations/${selectedPeriodKey}`)
+    .then(json => {
+      setPosition(json.data.currentLocation);
+    })
+
+    // const savedTreasures = localStorage.getItem(`openedTreasures_${selectedPeriodKey}`);
+    // setOpenedTreasures(savedTreasures ? JSON.parse(savedTreasures) : []);
 
     axios
-      .get(`/homeworkSchedules/?userId=1&vacationId=${selectedPeriodKey}`)
+      .get(`/homeworkSchedules/?userId=${userId}&vacationId=${selectedPeriodKey}`)
       .then((res) => {
         setTasks(res.data);
-        setCompletedTasks(res.data.map((task) => task.completed));
+        // setCompletedTasks(res.data.map((task) => task.completed));
+        setCompletedTasks(res.data.filter(task => task.completed === true));
       })
       .catch(() => {
         setTasks([]);
@@ -108,8 +122,18 @@ const SugorokuPage = () => {
   // position保存
   useEffect(() => {
     if (!selectedPeriodKey) return;
-    localStorage.setItem(`sugoroku_position_${selectedPeriodKey}`, position);
-  }, [position, selectedPeriodKey]);
+    // localStorage.setItem(`sugoroku_position_${selectedPeriodKey}`, position);
+    axios.get("/api/vacations/" + selectedPeriodKey)
+    .then(json => {
+      json.data.currentLocation = position;
+      return json.data;
+    })
+    .then(json => {
+      axios.post("/api/vacations/mod/", json)
+      .then(json => {console.log(json.data)})    
+    })
+
+  }, [position]);
 
   // 背景データ取得
   useEffect(() => {
@@ -175,36 +199,36 @@ const SugorokuPage = () => {
 
 
   // 期間更新検知（storageイベント）
-  useEffect(() => {
-    const checkUpdate = () => {
-      const updatedTime = localStorage.getItem("vacationsUpdated");
-      if (updatedTime) {
-        axios.get(`/api/vacations/user/1`).then((res) => {
-          const formatted = res.data.map((v) => {
-            const start = new Date(v.startDate);
-            const end = new Date(v.endDate);
-            const formatDate = (d) => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-            return {
-              id: v.id,
-              name: `${v.vacationName}（${formatDate(start)}〜${formatDate(end)}）`,
-            };
-          });
-          setPeriods(formatted);
-          if (!formatted.find((p) => p.id === selectedPeriodKey)) {
-            setSelectedPeriodKey(formatted.length > 0 ? formatted[0].id : null);
-            setPosition(0);
-            setOpenedTreasures([]);
-          }
-        });
-        localStorage.removeItem("vacationsUpdated");
-      }
-    };
+  // useEffect(() => {
+  //   const checkUpdate = () => {
+  //     const updatedTime = localStorage.getItem("vacationsUpdated");
+  //     if (updatedTime) {
+  //       axios.get(`/api/vacations/user/1`).then((res) => {
+  //         const formatted = res.data.map((v) => {
+  //           const start = new Date(v.startDate);
+  //           const end = new Date(v.endDate);
+  //           const formatDate = (d) => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+  //           return {
+  //             id: v.id,
+  //             name: `${v.vacationName}（${formatDate(start)}〜${formatDate(end)}）`,
+  //           };
+  //         });
+  //         setPeriods(formatted);
+  //         if (!formatted.find((p) => p.id === selectedPeriodKey)) {
+  //           setSelectedPeriodKey(formatted.length > 0 ? formatted[0].id : null);
+  //           setPosition(0);
+  //           setOpenedTreasures([]);
+  //         }
+  //       });
+  //       localStorage.removeItem("vacationsUpdated");
+  //     }
+  //   };
 
-    window.addEventListener("storage", checkUpdate);
-    return () => {
-      window.removeEventListener("storage", checkUpdate);
-    };
-  }, [selectedPeriodKey]);
+  //   window.addEventListener("storage", checkUpdate);
+  //   return () => {
+  //     window.removeEventListener("storage", checkUpdate);
+  //   };
+  // }, [selectedPeriodKey]);
 
   // 宝箱クリック処理
  // handleTreasureClick の中身
@@ -236,7 +260,8 @@ const handleTreasureClick = (taskIndex) => {
       const nextPos = prev + 1;
       if (nextPos > tasks.length) return prev; // position最大はtasks.length（スタート0から）
       if (nextPos === 0) return nextPos; // スタートは常にOK
-      if (!tasks[nextPos - 1]?.completed) {
+      // if (!tasks[nextPos - 1]?.completed) {
+      if (nextPos > completedTasks.length) {
         setMessage("次の宿題を完了しないと進めません！");
         setTimeout(() => setMessage(""), 3000);
         return prev;
@@ -245,6 +270,7 @@ const handleTreasureClick = (taskIndex) => {
         setMessage("ゴール！がんばったね🎉");
         setTimeout(() => setMessage(""), 3000);
       }
+      
       return nextPos;
     });
   };
@@ -306,9 +332,9 @@ const handleTreasureClick = (taskIndex) => {
           onChange={(e) => {
             const newPeriodKey = Number(e.target.value);
             setSelectedPeriodKey(newPeriodKey);
-            const saved = localStorage.getItem(`sugoroku_position_${newPeriodKey}`);
-            const initial = saved !== null ? Number(saved) : 0;
-            setPosition(initial);
+            // const saved = localStorage.getItem(`sugoroku_position_${newPeriodKey}`);
+            // const initial = saved !== null ? Number(saved) : 0;
+            // setPosition(initial);
             const savedTreasures = localStorage.getItem(`openedTreasures_${newPeriodKey}`);
             setOpenedTreasures(savedTreasures ? JSON.parse(savedTreasures) : []);
           }}

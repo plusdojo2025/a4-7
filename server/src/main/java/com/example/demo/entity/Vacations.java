@@ -25,4 +25,5 @@ public class Vacations {
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private LocalDate decisionDate;
+	private Integer currentLocation;
 }
