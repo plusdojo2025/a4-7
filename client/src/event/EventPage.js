@@ -1,5 +1,7 @@
 import React from "react";
 import Menu from '../components/MenuHeader';
+import TaskHeader from '../components/TaskHeader';
+import TriviaHeader from '../components/TriviaHeader';
 import './eventPage.css';
 import axios from "axios";
 
@@ -9,7 +11,13 @@ export default class EventPage extends React.Component {
         super(props);
         // state
         this.state = {
-            loginUserId: 3,             // ログインユーザーのid　仮で1とする！！！！！！！！！！！！
+            loginUserId: 1,             // ログインユーザーのid　仮で1とする！！！！！！！！！！！！
+            backgroundUrl: '',          // 背景画像用url
+            // vacations: [], 
+            // privateSchedules: [],
+            // columns: [],
+            // hwSchedules: [],
+            // selectedVacationIdx: 0,
             events: [],                 // セレクトボックスに表示するイベント用配列
             selectedEventIndex: 0,      // 選択中イベントの配列の添え字
             selectedEventTheme: "",     // 選択中のイベントテーマ
@@ -34,8 +42,6 @@ export default class EventPage extends React.Component {
             // 選択中イベントの全投稿取得
             axios.post("/api/pastPostList/", data)
             .then(response => {
-                console.log("他のユーザーの投稿");
-                console.log(response.data);
                 this.setState({
                     posts: response.data,           // 選択中イベントの全投稿
                     isPast: true                    // 選択中のイベント状況を終了済みに
@@ -45,8 +51,6 @@ export default class EventPage extends React.Component {
             // 選択中イベントの全投稿取得
             axios.post("/api/postList/", data)
             .then(response => {
-                console.log("他のユーザーの投稿");
-                console.log(response.data);
                 this.setState({
                     posts: response.data,            // 選択中イベントの全投稿
                     isPast: false                    // 選択中のイベント状況を開催中に
@@ -57,10 +61,8 @@ export default class EventPage extends React.Component {
         // ログインユーザーの投稿取得
         axios.post("/api/myPost/", data)
         .then(response => {
-            console.log("ログインユーザーの投稿");
             // レスポンスの有無チェック
             if (response.data != "") {          // レスポンスがある(=投稿済み)の場合
-                console.log(response.data);
                 this.setState({
                     content: response.data.content,         // 投稿内容
                     myLikeCount: response.data.count,       // 投稿についたいいね数
@@ -78,6 +80,66 @@ export default class EventPage extends React.Component {
 
     // 初期表示
     componentDidMount() {
+        const {selectedVacationIdx, loginUserId} = this.state;
+        // 背景画像の取得
+        axios.get('/users/' + loginUserId)
+        .then(userRes => {
+            const backgroundId = userRes.data.backgroundId;
+            return axios.get('/backgrounds/' + backgroundId, {
+            // return axios.get('/backgrounds/7', {
+            responseType: 'blob'
+            });
+        })
+        .then(bgRes => {
+            const blob = bgRes.data;
+            const imageUrl = URL.createObjectURL(blob);
+            this.setState({
+                backgroundUrl: imageUrl
+            });
+        })
+        .catch(error => {
+            console.error('背景画像の取得に失敗しました:', error);
+        })
+
+        // // まずは休暇情報を取得
+        // axios.get('/api/vacations/user/' + loginUserId)
+        // .then(json => {
+        //     console.log(json.data);
+        //     this.setState({
+        //         vacations: json.data,
+        //     }, () => {                
+        //         // TODO: 複数fetchをまとめて実行する方法を検討
+        //         // 休暇情報を取得した後に、選択された休暇の予定(私用・宿題)を取得
+        //         fetch("/privateSchedules/?userId="+loginUserId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
+        //         .then(response => {return response.json()})
+        //         .then (json => {
+        //             console.log(json);  
+        //             this.setState({
+        //                 privateSchedules: json
+        //             });
+        //         });
+                
+        //         fetch("/columns/?userId="+loginUserId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
+        //         .then(response => {return response.json()})
+        //         .then (json => {
+        //             console.log(json);  
+        //             this.setState({
+        //                 columns: json
+        //             });
+        //         });
+
+        //         fetch("/homeworkSchedules/?userId="+loginUserId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
+        //         .then(response => {return response.json()})
+        //         .then (json => {
+        //             console.log(json);  
+        //             this.setState({
+        //                 hwSchedules: json
+        //             });
+        //         });
+        //     }
+        //     );
+        // })
+
         // セレクトボックス用のイベント一覧取得
         fetch("/api/eventList/")
         .then(res => res.json())
@@ -155,17 +217,12 @@ export default class EventPage extends React.Component {
             postId: posts[index].id,        // いいねボタンを押した投稿のid
             userId: loginUserId             // ログインユーザーid
         }
-        console.log(posts[index]);
-        console.log("index" + index + ", evaluation_id" + posts[index].evaluationId);
-        console.log(data);
         // いいね登録・解除処理
         axios.post("/api/changeEvaluation/", data)
         .then(response => {
             if (response.data != null) {
                 const newPosts = [...posts];            // 投稿配列のコピー
                 newPosts[index] = response.data;        // コピーした配列でいいね処理した投稿データ更新
-                console.log(response.data);
-                console.log(newPosts[index]);
                 this.setState({
                     posts: newPosts             // 更新後の配列で更新
                 });
@@ -176,10 +233,30 @@ export default class EventPage extends React.Component {
     }
 
     render() {
-        const {events, selectedEventIndex, selectedEventTheme, isPast, content, myLikeCount, isPosted, posts} = this.state;
+        const {backgroundUrl,
+            vacations, 
+            hwSchedules,
+            selectedVacationIdx,
+            events, selectedEventIndex, selectedEventTheme, isPast, content, myLikeCount, isPosted, posts} = this.state;
         return (
-            <div id="event_page">
+            <div id="event_page"  className='backgroundImage' style={
+                backgroundUrl
+                ? { backgroundImage: `url(${backgroundUrl})` }
+                : { backgroundColor: "#282c34" } // fallback 背景
+            }>
                 {/* メニューコンポーネント */}
+                {/*
+                <ul id='header'>
+                    <li><TriviaHeader today={vacations[selectedVacationIdx].decisionDate}/></li>
+                    <li><h1>Schedule Page</h1></li>
+                    <li>
+                        <TaskHeader 
+                            taskList={hwSchedules.filter(content => content.contentDate === vacations[selectedVacationIdx].decisionDate)}
+                            checkBoxChange={this.handleCheckboxChange}                     
+                        />
+                    </li>
+                </ul>
+                */}
                 <Menu></Menu>
 
                 {/* 表示イベント選択セレクトボックス　デフォルトは現在開催中のイベント */}
