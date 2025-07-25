@@ -1,46 +1,163 @@
 /* sugoroku.css */
-
 .sugoroku-page {
-  padding: 16px;
-  background-color: #d1fae5; /* Tailwindのbg-green-100に近い */
-  border-radius: 16px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
 }
 
-.sugoroku-title {
-  font-size: 1.25rem;
+.loading {
+  font-size: 20px;
+  text-align: center;
+  padding: 20px;
+  color: #333;
+}
+
+.period-title {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.period-select-wrapper {
+  text-align: center;
+  margin-top: 10px;
+  color: #fff;
+}
+
+.period-select-wrapper label {
+  margin-right: 8px;
+}
+
+.message-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 10000;
+}
+
+.message-box {
+  background-color: #fff;
+  padding: 30px 50px;
+  border-radius: 12px;
+  font-size: 24px;
   font-weight: bold;
-  margin-bottom: 16px;
+  color: #333;
+  text-align: center;
 }
 
-.sugoroku-board {
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 11000;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 90%;
+  max-height: 80%;
+  overflow-y: auto;
+  text-align: center;
+}
+
+.bg-list {
   display: flex;
+  gap: 10px;
   flex-wrap: wrap;
-  gap: 8px;
-}
-
-.sugoroku-cell {
-  width: 64px;
-  height: 64px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: white;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
   justify-content: center;
+  margin-top: 10px;
 }
 
-.sugoroku-button {
-  margin-top: 16px;
-  padding: 8px 16px;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
+.bg-img {
+  width: 100px;
+  height: 80px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.bg-img.selected {
+  border: 3px solid #3b82f6;
+}
+
+.close-button {
+  margin-top: 20px;
+  padding: 8px 20px;
+  cursor: pointer;
   border-radius: 6px;
+  border: none;
+  background-color: #f59e0b;
+  color: #fff;
+  font-weight: bold;
+}
+
+.board-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 30px;
+}
+
+.board-grid {
+  display: grid;
+  gap: 10px;
+  background-color: rgba(255,255,255,0.8);
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.treasure-wrapper {
   cursor: pointer;
 }
 
-.sugoroku-button:hover {
-  background-color: #2563eb;
+.task-content {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.arrow {
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.goal-label {
+  color: red;
+  font-size: 12px;
+}
+
+.move-buttons {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.btn-back,
+.btn-forward {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.btn-back {
+  margin-right: 10px;
+  background-color: #f59e0b;
+}
+
+.btn-forward {
+  background-color: #3b82f6;
 }
