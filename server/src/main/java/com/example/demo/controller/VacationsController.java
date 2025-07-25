@@ -44,6 +44,13 @@ public class VacationsController {
         }
     }
     
+ // ユーザーIDで指定した休暇情報を取得
+    @GetMapping("/{vacationId}")
+    public Vacations getVacationsByVacationId(@PathVariable("vacationId") Integer vacationId) {
+        return vacationsRepository.findById(vacationId).get();       
+    }
+    
+    
     // 新しい休暇情報を作成
     @PostMapping
     public Vacations createVacation(@RequestBody Vacations vacation) {

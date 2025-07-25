@@ -22,12 +22,12 @@ insert into user_images (user_id, image_type, image_id) values
 (3, 1, 1);
 
 -- vacationsテーブル　ユーザー1:今年の夏休み, ユーザー2:去年と今年の夏休み, ユーザー3:未登録
-insert into vacations (user_id, vacation_name, start_date, end_date, decision_date) values
-(1, '夏休み', '2025-07-20', '2025-08-31', '2025-07-20'),
-(2, '夏休み', '2025-07-19', '2025-08-24', '2025-07-19'),
-(2, '夏休み', '2024-07-20', '2024-08-25', '2024-07-20'),
-(1, '冬休み', '2024-12-20', '2025-01-10', '2024-12-20'),
-(1, '春休み', '2024-03-20', '2024-04-01', '2024-03-20');
+insert into vacations (user_id, vacation_name, start_date, end_date, decision_date, current_location) values
+(1, '夏休み', '2025-07-20', '2025-08-31', '2025-07-20', 0),
+(2, '夏休み', '2025-07-19', '2025-08-24', '2025-07-19', 0),
+(2, '夏休み', '2024-07-20', '2024-08-25', '2024-07-20', 0),
+(1, '冬休み', '2024-12-20', '2025-01-10', '2024-12-20', 0),
+(1, '春休み', '2024-03-20', '2024-04-01', '2024-03-20', 0);
 
 -- private_schedulesテーブル
 insert into private_schedules (user_id, content, content_date, vacation_id) values
