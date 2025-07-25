@@ -8,20 +8,33 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.UserPost;
+import com.example.demo.entity.view.UserPostEvaluation;
 import com.example.demo.repository.UserPostsRepository;
+import com.example.demo.repository.view.UserPostEvaluationsRepository;
 
 @RestController
 public class UserPostController {
 
 	@Autowired
 	UserPostsRepository repository;
+	@Autowired
+	UserPostEvaluationsRepository peRepository;
 	
 	// 選択中イベントの投稿全取得
+//	@PostMapping("/api/postList/")
+//	public List<UserPost> getPosts(@RequestBody UserPost userPost) {
+//		Integer eventId = userPost.getEventId();
+//		List<UserPost> postList = repository.findByEventIdOrderByIdDesc(eventId);
+//		return postList;
+//	}
+	
+	// 選択中イベントの全投稿とログインユーザーがいいねしたかを取得
 	@PostMapping("/api/postList/")
-	public List<UserPost> getPosts(@RequestBody UserPost userPost) {
+	public List<UserPostEvaluation> getPosts(@RequestBody UserPost userPost) {
 		Integer eventId = userPost.getEventId();
-		List<UserPost> postList = repository.findByEventIdOrderByIdDesc(eventId);
-		return postList;
+		Integer userId = userPost.getUserId();
+		List<UserPostEvaluation> peList = peRepository.getPostWithEvaluation(eventId, userId);
+		return peList;
 	}
 	
 	// 選択中イベントのログインユーザーの投稿取得
@@ -30,7 +43,7 @@ public class UserPostController {
 		Integer eventId = userPost.getEventId();
 		Integer userId = userPost.getUserId();
 		UserPost myPost = repository.findByEventIdAndUserId(eventId, userId);
-		System.out.print(myPost);
+//		System.out.print(myPost);
 		return myPost;
 	}
 	
@@ -38,7 +51,7 @@ public class UserPostController {
 	@PostMapping("/api/post/")
 	public UserPost addMyPost(@RequestBody UserPost userPost) {
 		repository.save(userPost);
-		System.out.print(userPost);
+//		System.out.print(userPost);
 		return userPost;
 	}
 }

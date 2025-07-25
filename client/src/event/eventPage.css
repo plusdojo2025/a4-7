@@ -37,3 +37,9 @@
 #other .post_footer p {
     display: inline-block;
 }
+.like {
+    background-color: #ff0000;
+}
+.not_like {
+    background-color: #00ff00;
+}

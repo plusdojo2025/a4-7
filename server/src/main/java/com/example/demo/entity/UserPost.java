@@ -23,4 +23,10 @@ public class UserPost {
 	private Integer userId;
 	private String content;
 	private Integer count;
+	
+//	// 投稿1件に対するログインユーザーのいいねデータ
+//	@OneToOne(mappedBy = "userPost",
+//			cascade = CascadeType.ALL,
+//			fetch = FetchType.EAGER)		// 投稿データ取得時にいいねデータも同時取得
+//	private Evaluation evaluation;
 }
