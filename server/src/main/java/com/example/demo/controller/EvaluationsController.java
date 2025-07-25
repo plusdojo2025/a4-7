@@ -25,10 +25,10 @@ public class EvaluationsController {
 	private UserPostEvaluation changEvaluation(@RequestBody Evaluation evaluation) {
 		Integer postId = evaluation.getPostId();
 		Integer userId = evaluation.getUserId();
+		
 		// いいね済みか
 		if (eRepository.existsByPostIdAndUserId(postId, userId)) {	// いいね済み
 			// いいね解除
-			System.out.println("解除処理");
 			if (eRepository.deleteByPostIdAndUserId(postId, userId) != 1) {
 				return null;
 			}
@@ -39,7 +39,6 @@ public class EvaluationsController {
 			}
 		} else {													// いいねしてない
 			// いいね登録
-			System.out.println("いいね処理");
 			eRepository.save(evaluation);
 			
 			// いいね数+1

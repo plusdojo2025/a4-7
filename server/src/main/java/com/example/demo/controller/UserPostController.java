@@ -20,20 +20,21 @@ public class UserPostController {
 	@Autowired
 	UserPostEvaluationsRepository peRepository;
 	
-	// 選択中イベントの投稿全取得
-//	@PostMapping("/api/postList/")
-//	public List<UserPost> getPosts(@RequestBody UserPost userPost) {
-//		Integer eventId = userPost.getEventId();
-//		List<UserPost> postList = repository.findByEventIdOrderByIdDesc(eventId);
-//		return postList;
-//	}
-	
-	// 選択中イベントの全投稿とログインユーザーがいいねしたかを取得
+	// 開催中イベントの全投稿とログインユーザーがいいねしたかを取得
 	@PostMapping("/api/postList/")
 	public List<UserPostEvaluation> getPosts(@RequestBody UserPost userPost) {
 		Integer eventId = userPost.getEventId();
 		Integer userId = userPost.getUserId();
 		List<UserPostEvaluation> peList = peRepository.getPostWithEvaluation(eventId, userId);
+		return peList;
+	}
+	
+	// 過去イベントの全投稿とログインユーザーがいいねしたかを取得
+	@PostMapping("/api/pastPostList/")
+	public List<UserPostEvaluation> getPastPosts(@RequestBody UserPost userPost) {
+		Integer eventId = userPost.getEventId();
+		Integer userId = userPost.getUserId();
+		List<UserPostEvaluation> peList = peRepository.getPastPostWithEvaluation(eventId, userId);
 		return peList;
 	}
 	
@@ -43,7 +44,6 @@ public class UserPostController {
 		Integer eventId = userPost.getEventId();
 		Integer userId = userPost.getUserId();
 		UserPost myPost = repository.findByEventIdAndUserId(eventId, userId);
-//		System.out.print(myPost);
 		return myPost;
 	}
 	
@@ -51,7 +51,6 @@ public class UserPostController {
 	@PostMapping("/api/post/")
 	public UserPost addMyPost(@RequestBody UserPost userPost) {
 		repository.save(userPost);
-//		System.out.print(userPost);
 		return userPost;
 	}
 }

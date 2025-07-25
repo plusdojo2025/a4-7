@@ -1,7 +1,5 @@
 package com.example.demo.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,9 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.entity.UserPost;
 
 public interface UserPostsRepository extends JpaRepository<UserPost, Integer> {
-	
-	// 選択中イベントの全投稿を取得するメソッド
-	List<UserPost> findByEventIdOrderByIdDesc(Integer eventId);
 	
 	// 選択中イベントのログインユーザーの投稿を取得するメソッド
 	UserPost findByEventIdAndUserId(Integer eventId, Integer userId);
