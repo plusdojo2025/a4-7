@@ -9,7 +9,7 @@ import com.example.demo.entity.EventTheme;
 
 public interface EventThemesRepository extends JpaRepository<EventTheme, Integer> {
 	
-	// 過去から現在開催中までのイベントタイトルを取得するメソッド
+	// 過去から現在開催中までのイベント情報を取得するメソッド
 	@Query(value = "select * from event_themes "
 			+ "where end_date <= curdate() "
 			+ "or curdate() between start_date and end_date "

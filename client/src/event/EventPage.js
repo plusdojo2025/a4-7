@@ -14,7 +14,6 @@ export default class EventPage extends React.Component {
             selectedEventIndex: 0,      // 選択中イベントの配列の添え字
             selectedEventTheme: "",     // 選択中のイベントテーマ
             content: "",                // 投稿内容
-            like: false,                // いいねのステータス　デフォルトはいいねしてない状態
             posts: [],                  // 他の人の投稿を格納する配列
             isPosted: false,            // ログインユーザーの投稿状態　デフォルトは未投稿
             myLikeCount: 0,             // ログインユーザーの投稿についたいいね数
@@ -59,6 +58,12 @@ export default class EventPage extends React.Component {
                         myLikeCount: response.data.count,       // 投稿についたいいね数
                         isPosted: true                          // 投稿状態を投稿済みに
                     });
+                } else {
+                    this.setState({
+                        content: "",                            // 投稿内容の初期化
+                        myLikeCount: 0,                         // いいね数の初期化
+                        isPosted: false                         // 投稿状態の初期化
+                    });
                 }
             })
         });
@@ -72,15 +77,39 @@ export default class EventPage extends React.Component {
             selectedEventIndex: targetIndex,                // 選択中イベントの配列の添え字
             selectedEventTheme: events[targetIndex].theme   // 選択中イベントのテーマ
         });
-
+        
+        const data = {
+            eventId: events[targetIndex].id,        // 選択中イベントid
+            userId: this.state.loginUserId          // ログインユーザーのid
+        };
         // 選択中イベントの全投稿取得
-        const data = {eventId: events[targetIndex].id};       // 選択中イベントid
         axios.post("/api/postList/", data)
         .then(response => {
             console.log(response.data);
             this.setState({
                 posts: response.data            // 選択中イベントの全投稿
             });
+        })
+
+        // ログインユーザーの投稿取得
+        axios.post("/api/myPost/", data)
+        .then(response => {
+            console.log("ログインユーザーの投稿");
+            // レスポンスの有無チェック
+            if (response.data != "") {          // レスポンスがある(=投稿済み)の場合
+                console.log(response.data);
+                this.setState({
+                    content: response.data.content,         // 投稿内容
+                    myLikeCount: response.data.count,       // 投稿についたいいね数
+                    isPosted: true                          // 投稿状態を投稿済みに
+                });
+            } else {
+                this.setState({
+                    content: "",                            // 投稿内容の初期化
+                    myLikeCount: 0,                         // いいね数の初期化
+                    isPosted: false                         // 投稿状態の初期化
+                });
+            }
         })
     }
 
@@ -118,11 +147,29 @@ export default class EventPage extends React.Component {
     }
 
     // いいね
-    toggleLike = () => {
-        const like = this.state.like;
-        console.log(like);
-        this.setState({
-            like: !like
+    toggleLike = (index) => {
+        const {posts, loginUserId} = this.state;
+        const data = {
+            postId: posts[index].id,        // いいねボタンを押した投稿のid
+            userId: loginUserId             // ログインユーザーid
+        }
+        console.log(posts[index]);
+        console.log("index" + index + ", evaluation_id" + posts[index].evaluationId);
+        console.log(data);
+        // いいね登録・解除処理
+        axios.post("/api/changeEvaluation/", data)
+        .then(response => {
+            if (response.data != null) {
+                const newPosts = [...posts];            // 投稿配列のコピー
+                newPosts[index] = response.data;        // コピーした配列でいいね処理した投稿データ更新
+                console.log(response.data);
+                console.log(newPosts[index]);
+                this.setState({
+                    posts: newPosts             // 更新後の配列で更新
+                });
+            } else {
+                window.alert("いいねができませんでした");
+            }
         });
     }
 
@@ -170,7 +217,11 @@ export default class EventPage extends React.Component {
                                 </div>
                                 <div className="post_footer">
                                     <p>{post.count}</p>
-                                    <button onClick={this.toggleLike}>いいね！</button>
+                                    <button onClick={() => {this.toggleLike(index)}} className={post.evaluationId
+                                        ? "like"
+                                        : "not_like"
+                                        }
+                                    >{post.evaluationId ? "いいね済み" : "いいね！"}</button>
                                 </div>
                             </div>
                         )}
