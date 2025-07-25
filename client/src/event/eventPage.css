@@ -1,5 +1,5 @@
 #event_page {
-    /* display: block; */
+    
 }
 .backgroundImage {
     width: 100%;
@@ -11,6 +11,9 @@
 .container {
     width: 260px;
     margin: 10px auto;
+}
+.post {
+    width: 260px;
 }
 .post_content {
     background-color: #ffffff;
@@ -35,6 +38,22 @@
 .post_footer p {
     margin: 5px;
 }
+.post_footer button {
+    height: 35px;
+    width: 90px;
+}
+.post_footer button:hover {
+    cursor: pointer;
+}
+.post_footer button:disabled {
+    cursor: default;
+    background-color: #ffffff;
+    opacity: 0.7;
+}
+#other {
+    width: 70%;
+    margin: auto;
+}
 #other .container {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -44,9 +63,9 @@
 #other .post_footer p {
     display: inline-block;
 }
-.like {
-    background-color: #ff0000;
+.post_footer .like {
+    width: 120px;
 }
-.not_like {
-    background-color: #00ff00;
+.post_footer .not_like {
+    
 }

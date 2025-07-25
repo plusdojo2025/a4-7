@@ -11,7 +11,7 @@ export default class EventPage extends React.Component {
         super(props);
         // state
         this.state = {
-            loginUserId: 1,             // ログインユーザーのid　仮で1とする！！！！！！！！！！！！
+            loginUserId: 3,             // ログインユーザーのid　仮で1とする！！！！！！！！！！！！
             backgroundUrl: '',          // 背景画像用url
             // vacations: [], 
             // privateSchedules: [],
@@ -303,7 +303,7 @@ export default class EventPage extends React.Component {
                                             ? "like"            // ログインユーザーのいいね状態でボタンデザイン変更
                                             : "not_like"
                                             }
-                                    >{post.evaluationId ? "いいね済み" : "いいね！"}</button>
+                                    >{post.evaluationId ? "💖いいねしたよ" : "👍いいね！"}</button>
                                 </div>
                             </div>
                         )}
