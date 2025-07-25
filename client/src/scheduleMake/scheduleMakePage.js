@@ -95,7 +95,18 @@ export default class ScheduleMakePage extends React.Component {
                 { date: '2025-07-22', event: 'じゅく' },
                 { date: '2025-07-25', event: '海に行く' },
                 { date: '2025-08-04', event: 'サッカーする' },
-                { date: '2025-08-06', event: 'じゅく' }
+                { date: '2025-08-06', event: 'じゅく' },
+                
+                { date: '2025-12-22', event: 'じゅく' },
+                { date: '2025-12-25', event: '友達とあそぶ' },
+                { date: '2026-01-04', event: 'サッカーする' },
+                { date: '2026-01-06', event: 'じゅく' },
+
+                { date: '2026-03-22', event: 'じゅく' },
+                { date: '2026-03-25', event: '友達とあそぶ' },
+                { date: '2026-03-30', event: 'サッカーする' },
+                { date: '2026-04-01', event: 'じゅく' }
+
             ],
             
             // 現在選択中の固定課題リスト
@@ -149,7 +160,17 @@ export default class ScheduleMakePage extends React.Component {
                             { date: '2025-07-22', content: 'ワーク 10～12', checked: false },
                             { date: '2025-07-24', content: 'ワーク 13～15', checked: false },
                             { date: '2025-08-04', content: 'ワーク 20～22', checked: false },
-                            { date: '2025-08-06', content: 'ワーク 24～25', checked: false }
+                            { date: '2025-08-06', content: 'ワーク 24～25', checked: false },
+
+                            { date: '2025-12-27', content: 'ワーク 10～12', checked: false },
+                            { date: '2025-12-30', content: 'ワーク 13～15', checked: false },
+                            { date: '2026-01-02', content: 'ワーク 20～22', checked: false },
+                            { date: '2026-01-04', content: 'ワーク 24～25', checked: false },
+
+                            { date: '2026-03-27', content: 'ワーク 10～12', checked: false },
+                            { date: '2026-03-29', content: 'ワーク 13～15', checked: false },
+                            { date: '2026-03-30', content: 'ワーク 20～22', checked: false },
+                            { date: '2026-04-01', content: 'ワーク 24～25', checked: false }
                     ], 
                     columnInfoId: 4, 
                     helpText: "学校で配られたワークを進めよう！1日2〜3ページずつ取り組むのがおすすめ！",
@@ -173,71 +194,43 @@ export default class ScheduleMakePage extends React.Component {
         document.removeEventListener('click', this.handleDocumentClick);
     }
 
-    // 保存ボタンが押されたとき
-    handleSave = async () => {
-        // 休暇データを保存
+// 保存ボタンが押されたとき
+handleSave = async () => {
+    if (!window.confirm('この内容で登録します')) return;
+
+    try {
         const saveData = {
             userId: this.state.usersId,
             vacationName: this.state.selectedVacation,
             startDate: this.state.vacationStart,
             endDate: this.state.vacationEnd,
         };
-        
-        try {
-            // const response = await fetch('/api/vacations', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(saveData)
-            // });
 
-            axios.post('/api/vacations', saveData)
-            .then(json=>{
-                this.setState(
-                    {vacationId: json.data.id}, ()=>{
-                        this.savePrivateSchedules();
-                        this.saveColumns();
-                    }
-                );
-                return "hoge"
-            })          
-            .then(_=>{
-                window.location.href = '/'
-            })
+        const vacationResponse = await axios.post('/api/vacations', saveData);
+        const vacationId = vacationResponse.data.id;
 
-        } catch (error) {
-            console.error('休暇保存エラー:', error);
-            return;
-        }
+        this.setState({ vacationId });
 
-        // // プライベート予定を保存
-        // await this.savePrivateSchedules();
-        
-        // // 宿題予定を保存
-        // await this.saveHomeworkSchedules();
+        await this.savePrivateSchedules(vacationId);
+        await this.saveColumns(vacationId);
+
+        window.location.href = '/';
+    } catch (error) {
+        alert('保存中にエラーが発生しました: ' + error.message);
     }
+}
 
-    // プライベート予定の保存
-    savePrivateSchedules = async () => {
+// プライベート予定の保存
+savePrivateSchedules = async (vacationId) => {
+    try {
         for (const schedule of this.state.privateSchedules) {
             if (schedule.event && schedule.event.trim() !== '') {
                 const privateScheduleData = {
                     userId: this.state.usersId,
                     content: schedule.event,
                     contentDate: schedule.date,
-                    vacationId: this.state.vacationId
+                    vacationId
                 };
-
-                // 既存データがあるかチェック
-                // const checkResponse = await fetch(`/privateSchedules/?userId=${this.state.usersId}&vacationId=${this.state.vacationId}`);
-                
-                // if (checkResponse.ok) {
-                //     const existingSchedules = await checkResponse.json();
-                //     const existingSchedule = existingSchedules.find(s => s.contentDate === schedule.date);
-                    
-                //     if (existingSchedule) {
-                //         privateScheduleData.id = existingSchedule.id;
-                //     }
-                // }
 
                 const response = await fetch('/privateSchedules/mod/', {
                     method: 'POST',
@@ -246,75 +239,48 @@ export default class ScheduleMakePage extends React.Component {
                 });
 
                 if (!response.ok) {
-                    console.error('プライベート予定保存失敗:', response.status);
+                    const errorText = await response.text();
+                    throw new Error(`プライベート予定保存失敗: ${response.status} - ${errorText}`);
                 }
             }
         }
+    } catch (error) {
+        throw error;
     }
+}
 
-    saveColumns = () => {
+// カラム・宿題データの保存
+saveColumns = async (vacationId) => {
+    try {
         let columnsOrder = 0;
 
-        // 固定課題
-        this.state.fixedHwSchedulesList.map((hw, idx) => {
-            const columnsData = {
-                userId: this.state.usersId,
-                columnTitle: hw.name,
-                position: columnsOrder,
-                vacationId: this.state.vacationId
+        const processSchedules = async (scheduleList) => {
+            for (const hw of scheduleList) {
+                const columnsData = {
+                    userId: this.state.usersId,
+                    columnTitle: hw.name,
+                    position: columnsOrder++,
+                    vacationId
+                };
+
+                const columnResponse = await axios.post('/columns/save', columnsData);
+                const columnId = columnResponse.data.id;
+
+                await this.saveEachHomework({ ...hw, columnInfoId: columnId }, vacationId);
             }
+        };
 
-            columnsOrder++;
+        await processSchedules(this.state.fixedHwSchedulesList);
+        await processSchedules(this.state.additionalHwSchedulesList);
 
-            axios.post(`/columns/save`, columnsData)
-            .then(json=>{
-                this.state.fixedHwSchedulesList[idx].columnInfoId = json.data.id
-                return this.state.fixedHwSchedulesList[idx]
-            })
-            .then(hwUpdated => {
-                this.saveEachHomework(hwUpdated);
-            })
-        })
-
-        // 追加課題
-        this.state.additionalHwSchedulesList.map((hw, idx) => {
-            const columnsData = {
-                userId: this.state.usersId,
-                columnTitle: hw.name,
-                position: columnsOrder,
-                vacationId: this.state.vacationId
-            }
-
-            columnsOrder++;
-
-            axios.post(`/columns/save`, columnsData)
-            .then(json=>{
-                this.state.additionalHwSchedulesList[idx].columnInfoId = json.data.id
-                return this.state.additionalHwSchedulesList[idx]
-            })
-            .then(hwUpdated => {
-                this.saveEachHomework(hwUpdated);
-            })
-        })
+    } catch (error) {
+        throw error;
     }
+}
 
-    // 宿題予定の保存
-    // saveHomeworkSchedules = async () => {
-    //     // 固定課題を保存　　　
-    //     for (const hw of this.state.fixedHwSchedulesList) {
-    //         await this.saveEachHomework(hw);
-    //     }
-        
-    //     // 追加課題を保存
-    //     for (const hw of this.state.additionalHwSchedulesList) {
-    //         await this.saveEachHomework(hw);
-    //     }
-        
-    //     alert('予定が保存されました');
-    // }
-
-    // 各宿題の内容を保存
-    saveEachHomework = async (homework) => {
+// 各宿題の内容を保存
+saveEachHomework = async (homework, vacationId) => {
+    try {
         for (const content of homework.contents) {
             if (content.content && content.content.trim() !== '') {
                 const homeworkScheduleData = {
@@ -324,9 +290,8 @@ export default class ScheduleMakePage extends React.Component {
                     contentDate: content.date,
                     completed: false,
                     contentOrder: 0,
-                    vacationId: this.state.vacationId
+                    vacationId
                 };
-
 
                 const response = await fetch('/homeworkSchedules/mod/', {
                     method: 'POST',
@@ -335,13 +300,15 @@ export default class ScheduleMakePage extends React.Component {
                 });
 
                 if (!response.ok) {
-                    console.error('宿題予定保存失敗:', response.status);
+                    const errorText = await response.text();
+                    throw new Error(`宿題予定保存失敗: ${response.status} - ${errorText}`);
                 }
-
-
             }
         }
+    } catch (error) {
+        throw error;
     }
+}
 
     // 休暇が変更されたとき
     handleVacationChange = (event) => {
@@ -671,7 +638,7 @@ export default class ScheduleMakePage extends React.Component {
                     <button onClick={this.handleSave}>決定</button>
                 </div>
 
-                <button onClick={this.openModal}>推薦図書</button>
+   <button onClick={this.openModal}>推薦図書</button>
 
                 {this.state.showModal && (
                     <div id='modal'>
