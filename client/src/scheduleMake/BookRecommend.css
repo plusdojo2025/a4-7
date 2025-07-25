@@ -15,7 +15,7 @@
     height: 160px;
     border:none;
     position: relative;
-    right:50px;
+    right:55px;
 }
 
 .bookbutton{
@@ -26,11 +26,22 @@
     margin:none;
 }
 
-#fixedbookclose img{
+.forgrade{
+    border-bottom: 5px;
+    border-color:cadetblue;
+}
+
+#fixedbookclose{
+    position:sticky;
+    top:0%;
+}
+
+#closemark img{
     width: 40px;
     height: 40px;
-    position: fixed;
-    left: 110px;
+    position: relative;
+    right: 48%;
+    z-index: 1;
 }
 
 #bookclose{

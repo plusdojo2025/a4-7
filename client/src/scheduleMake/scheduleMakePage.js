@@ -4,6 +4,7 @@ import Menu from '../components/MenuHeader';
 import '../schedule/SchedulePage.css'; 
 import './ScheduleMakePage.css';
 import BookRecommend from "./BookRecommend"
+import './BookRecommend.css';
 
 export default class ScheduleMakePage extends React.Component {
     constructor(props) {
@@ -648,8 +649,11 @@ saveEachHomework = async (homework, vacationId) => {
                 {this.state.showModal && (
                     <div id='modal'>
                         <div id='modalContent'>
+                            <div id="fixedbookclose">
+                            <a id="closemark" onClick={this.closeModal}><img src="books/xmark-solid-full.svg"/></a>
+                            </div>
                             <BookRecommend />
-                            <button onClick={this.closeModal}>閉じる</button>
+                            <button id="bookclose" onClick={this.closeModal}>閉じる</button>
                         </div>
                     </div>
                 )}  
