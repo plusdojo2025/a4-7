@@ -32,12 +32,13 @@ const SugorokuPage = () => {
   const [periods, setPeriods] = useState([]);
   const [selectedPeriodKey, setSelectedPeriodKey] = useState("");
   const [tasks, setTasks] = useState([]);
-  const [position, setPosition] = useState(0);
+  const [position, setPosition] = useState(0); // 0がスタートマス
   const [message, setMessage] = useState("");
   const [unlockedBackgrounds, setUnlockedBackgrounds] = useState(["natsu/0.png"]);
   const [currentBackground, setCurrentBackground] = useState("natsu/0.png");
   const [showBgModal, setShowBgModal] = useState(false);
   const [openedTreasures, setOpenedTreasures] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
 
   const backgroundMap = {
     1: { 1: "natsu/1.png", 2: "natsu/2.png", 3: "natsu/3.png", 4: "natsu/4.png" },
@@ -45,6 +46,7 @@ const SugorokuPage = () => {
     5: { 1: "haru/1.png", 2: "haru/2.png", 3: "haru/3.png", 4: "haru/4.png" },
   };
 
+  // 期間データ取得
   useEffect(() => {
     axios.get(`/api/vacations/user/1`).then((res) => {
       const formatted = res.data.map((v) => {
@@ -61,33 +63,28 @@ const SugorokuPage = () => {
     });
   }, []);
 
+  // position変化で宝箱と背景管理
   useEffect(() => {
-  // positionが変わったら
-  // 現在のposition以下の宝箱のみをopenedTreasuresに残す
-  const filteredTreasures = openedTreasures.filter((index) => index <= position);
+    const filteredTreasures = openedTreasures.filter((index) => index <= position);
 
-  // openedTreasuresが変わるなら更新
-  if (filteredTreasures.length !== openedTreasures.length) {
-    setOpenedTreasures(filteredTreasures);
-  }
+    if (filteredTreasures.length !== openedTreasures.length) {
+      setOpenedTreasures(filteredTreasures);
+    }
 
-  // その位置までに獲得可能な背景を決める（backgroundMapで位置対応）
-  const map = backgroundMap[selectedPeriodKey] || {};
-  let lastBg = "natsu/0.png"; // 初期背景
+    const map = backgroundMap[selectedPeriodKey] || {};
+    let lastBg = "natsu/0.png"; // 初期背景
 
-  // position以下で開けた宝箱の背景を順に最後のものにする
-  filteredTreasures.forEach((idx) => {
-    if (map[idx]) lastBg = map[idx];
-  });
+    filteredTreasures.forEach((idx) => {
+      if (map[idx]) lastBg = map[idx];
+    });
 
-  // currentBackgroundが違ったらセットし直し＆localStorage更新
-  if (lastBg !== currentBackground) {
-    setCurrentBackground(lastBg);
-    localStorage.setItem(`currentBackground-${selectedPeriodKey}`, lastBg);
-  }
-}, [position, selectedPeriodKey]);
+    if (lastBg !== currentBackground) {
+      setCurrentBackground(lastBg);
+      localStorage.setItem(`currentBackground-${selectedPeriodKey}`, lastBg);
+    }
+  }, [position, selectedPeriodKey]);
 
-
+  // 選択期間が変わったらデータロード
   useEffect(() => {
     if (!selectedPeriodKey) return;
     const savedPos = localStorage.getItem(`sugoroku_position_${selectedPeriodKey}`);
@@ -96,37 +93,45 @@ const SugorokuPage = () => {
     const savedTreasures = localStorage.getItem(`openedTreasures_${selectedPeriodKey}`);
     setOpenedTreasures(savedTreasures ? JSON.parse(savedTreasures) : []);
 
-    axios.get(`/homeworkSchedules/?userId=1&vacationId=${selectedPeriodKey}`)
-      .then(res => setTasks(res.data))
-      .catch(() => setTasks([]));
+    axios
+      .get(`/homeworkSchedules/?userId=1&vacationId=${selectedPeriodKey}`)
+      .then((res) => {
+        setTasks(res.data);
+        setCompletedTasks(res.data.map((task) => task.completed));
+      })
+      .catch(() => {
+        setTasks([]);
+        setCompletedTasks([]);
+      });
   }, [selectedPeriodKey]);
 
+  // position保存
   useEffect(() => {
     if (!selectedPeriodKey) return;
     localStorage.setItem(`sugoroku_position_${selectedPeriodKey}`, position);
   }, [position, selectedPeriodKey]);
 
+  // 背景データ取得
   useEffect(() => {
-  axios.get("/backgrounds")
-    .then(res => {
-      const backgrounds = res.data;
-      const getPath = bg => bg.path || `natsu/${bg.id - 1}.png`;
+    axios
+      .get("/backgrounds")
+      .then((res) => {
+        const backgrounds = res.data;
+        const getPath = (bg) => bg.path || `natsu/${bg.id - 1}.png`;
+        const initialUnlocked = backgrounds.length > 0 ? [getPath(backgrounds[0])] : [];
+        const savedBg = localStorage.getItem(`currentBackground-${selectedPeriodKey}`);
 
-      const initialUnlocked = backgrounds.length > 0 ? [getPath(backgrounds[0])] : [];
+        setUnlockedBackgrounds(initialUnlocked);
+        setCurrentBackground(savedBg || initialUnlocked[0]);
+      })
+      .catch((err) => {
+        console.error("背景情報取得エラー", err);
+        setUnlockedBackgrounds([]);
+        setCurrentBackground(null);
+      });
+  }, [selectedPeriodKey]);
 
-      // localStorage から保存済み背景を取得（なければ初期背景）
-      const savedBg = localStorage.getItem(`currentBackground-${selectedPeriodKey}`);
-
-      setUnlockedBackgrounds(initialUnlocked);
-      setCurrentBackground(savedBg || initialUnlocked[0]);
-    })
-    .catch(err => {
-      console.error("背景情報取得エラー", err);
-      setUnlockedBackgrounds([]);
-      setCurrentBackground(null);
-    });
-}, [selectedPeriodKey]);
-
+  // 宝箱開封管理・アンロック背景更新
   useEffect(() => {
     if (!selectedPeriodKey) return;
     localStorage.setItem(`openedTreasures_${selectedPeriodKey}`, JSON.stringify(openedTreasures));
@@ -144,41 +149,68 @@ const SugorokuPage = () => {
     }
   }, [openedTreasures, selectedPeriodKey]);
 
-  useEffect(() => {
-  const checkUpdate = () => {
-    const updatedTime = localStorage.getItem('vacationsUpdated');
-    if (updatedTime) {
-      axios.get(`/api/vacations/user/1`).then((res) => {
-        const formatted = res.data.map((v) => {
-          const start = new Date(v.startDate);
-          const end = new Date(v.endDate);
-          const formatDate = (d) => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-          return {
-            id: v.id,
-            name: `${v.vacationName}（${formatDate(start)}〜${formatDate(end)}）`,
-          };
-        });
-        setPeriods(formatted);
-        if (!formatted.find(p => p.id === selectedPeriodKey)) {
-          setSelectedPeriodKey(formatted.length > 0 ? formatted[0].id : null);
-          setPosition(0);
-          setOpenedTreasures([]);
-        }
-      });
-      localStorage.removeItem('vacationsUpdated');
+  // completedTasksが変わったらposition巻き戻し等
+ useEffect(() => {
+  const lastCompletedIndex = completedTasks.lastIndexOf(true);
+
+  if (lastCompletedIndex + 1 < position) {
+    const newPosition = lastCompletedIndex + 1;
+    setPosition(newPosition);
+
+    const newOpened = openedTreasures.filter(i => i <= newPosition);
+    setOpenedTreasures(newOpened);
+
+    if (newOpened.length > 0) {
+      const lastBgIndex = Math.max(...newOpened);
+      const bgPath = backgroundMap[selectedPeriodKey]?.[lastBgIndex] ?? "natsu/0.png";
+      setCurrentBackground(bgPath);
+      localStorage.setItem(`currentBackground-${selectedPeriodKey}`, bgPath);
+    } else {
+      const initialBg = "natsu/0.png";
+      setCurrentBackground(initialBg);
+      localStorage.setItem(`currentBackground-${selectedPeriodKey}`, initialBg);
     }
-  };
-
-  window.addEventListener('storage', checkUpdate);
-
-  return () => {
-    window.removeEventListener('storage', checkUpdate);
-  };
-}, [selectedPeriodKey]);
+  }
+}, [completedTasks]);
 
 
-  const handleTreasureClick = (taskIndex) => {
-  if (position < taskIndex) return;
+  // 期間更新検知（storageイベント）
+  useEffect(() => {
+    const checkUpdate = () => {
+      const updatedTime = localStorage.getItem("vacationsUpdated");
+      if (updatedTime) {
+        axios.get(`/api/vacations/user/1`).then((res) => {
+          const formatted = res.data.map((v) => {
+            const start = new Date(v.startDate);
+            const end = new Date(v.endDate);
+            const formatDate = (d) => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+            return {
+              id: v.id,
+              name: `${v.vacationName}（${formatDate(start)}〜${formatDate(end)}）`,
+            };
+          });
+          setPeriods(formatted);
+          if (!formatted.find((p) => p.id === selectedPeriodKey)) {
+            setSelectedPeriodKey(formatted.length > 0 ? formatted[0].id : null);
+            setPosition(0);
+            setOpenedTreasures([]);
+          }
+        });
+        localStorage.removeItem("vacationsUpdated");
+      }
+    };
+
+    window.addEventListener("storage", checkUpdate);
+    return () => {
+      window.removeEventListener("storage", checkUpdate);
+    };
+  }, [selectedPeriodKey]);
+
+  // 宝箱クリック処理
+ // handleTreasureClick の中身
+const handleTreasureClick = (taskIndex) => {
+  console.log("宝箱クリック", taskIndex, "position", position);
+  if (position < taskIndex) return; // 進行位置が足りないなら無効
 
   if (openedTreasures.includes(taskIndex)) {
     setShowBgModal(true);
@@ -190,7 +222,7 @@ const SugorokuPage = () => {
   const bgPath = backgroundMap[selectedPeriodKey]?.[taskIndex];
   if (bgPath) {
     setCurrentBackground(bgPath);
-    localStorage.setItem(`currentBackground-${selectedPeriodKey}`, bgPath); // ← 追加
+    localStorage.setItem(`currentBackground-${selectedPeriodKey}`, bgPath);
   }
 
   setMessage("新しい背景を手に入れたよ！🎁");
@@ -198,17 +230,18 @@ const SugorokuPage = () => {
   setShowBgModal(true);
 };
 
-
+  // すすむボタン
   const handleMoveForward = () => {
     setPosition((prev) => {
       const nextPos = prev + 1;
-      if (nextPos >= tasks.length) return prev;
-      if (!tasks[nextPos]?.completed) {
+      if (nextPos > tasks.length) return prev; // position最大はtasks.length（スタート0から）
+      if (nextPos === 0) return nextPos; // スタートは常にOK
+      if (!tasks[nextPos - 1]?.completed) {
         setMessage("次の宿題を完了しないと進めません！");
         setTimeout(() => setMessage(""), 3000);
         return prev;
       }
-      if (nextPos === tasks.length - 1) {
+      if (nextPos === tasks.length) {
         setMessage("ゴール！がんばったね🎉");
         setTimeout(() => setMessage(""), 3000);
       }
@@ -216,22 +249,39 @@ const SugorokuPage = () => {
     });
   };
 
-  const size = Math.ceil(Math.sqrt(tasks.length));
+  const size = Math.ceil(Math.sqrt(tasks.length + 1));
   const spiral = generateSpiralIndexes(size);
-  const treasurePositions = [
-    Math.floor(tasks.length * 1 / 5),
-    Math.floor(tasks.length * 2 / 5),
-    Math.floor(tasks.length * 3 / 5),
-    Math.floor(tasks.length * 4 / 5),
-  ];
 
+  // 宝箱位置はタスク番号なので+1シフトしてる分注意
+  const treasurePositions = [
+  Math.floor(tasks.length * 1 / 5),
+  Math.floor(tasks.length * 2 / 5),
+  Math.floor(tasks.length * 3 / 5),
+  Math.floor(tasks.length * 4 / 5),
+];
+
+
+  // 宿題の完了切り替え
+  const handleTaskToggle = (index) => {
+    const newTasks = [...tasks];
+    newTasks[index].completed = !newTasks[index].completed;
+    setTasks(newTasks);
+    setCompletedTasks(newTasks.map((task) => task.completed));
+  };
+
+  // 矢印表示（隣接セル方向）
   const getArrow = (index) => {
-    if (index >= tasks.length - 1) return "";
+    if (index >= tasks.length) return "";
     const nextIndex = index + 1;
     for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
         if (spiral[r][c] === index) {
-          const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+          const directions = [
+            [0, 1],
+            [1, 0],
+            [0, -1],
+            [-1, 0],
+          ];
           for (let d = 0; d < 4; d++) {
             const [dr, dc] = directions[d];
             if (spiral[r + dr]?.[c + dc] === nextIndex) return ["→", "↓", "←", "↑"][d];
@@ -243,7 +293,10 @@ const SugorokuPage = () => {
   };
 
   return (
-    <div className="sugoroku-page" style={{ backgroundImage: currentBackground ? `url(/${currentBackground})` : "none" }}>
+    <div
+      className="sugoroku-page"
+      style={{ backgroundImage: currentBackground ? `url(/${currentBackground})` : "none" }}
+    >
       <MenuHeader />
       <h2 className="period-title">{periods.find((p) => p.id === selectedPeriodKey)?.name || "期間未選択"}</h2>
       <div className="period-select-wrapper">
@@ -261,12 +314,18 @@ const SugorokuPage = () => {
           }}
         >
           {periods.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
           ))}
         </select>
       </div>
 
-      {message && <div className="message-overlay"><div className="message-box">{message}</div></div>}
+      {message && (
+        <div className="message-overlay">
+          <div className="message-box">{message}</div>
+        </div>
+      )}
 
       {showBgModal && (
         <div className="modal-overlay">
@@ -287,7 +346,9 @@ const SugorokuPage = () => {
                 />
               ))}
             </div>
-            <button className="close-button" onClick={() => setShowBgModal(false)}>閉じる</button>
+            <button className="close-button" onClick={() => setShowBgModal(false)}>
+              閉じる
+            </button>
           </div>
         </div>
       )}
@@ -296,29 +357,36 @@ const SugorokuPage = () => {
         <div className="board-grid" style={{ gridTemplateColumns: `repeat(${size}, 80px)` }}>
           {spiral.flat().map((taskIndex, i) => (
             <SugorokuCell key={i} isDone={taskIndex < position}>
-              {taskIndex < tasks.length && (
-                <>
-                  {position === taskIndex && <Avatar />}
-                  {treasurePositions.includes(taskIndex) && (
-                    <div className="treasure-wrapper" onClick={() => handleTreasureClick(taskIndex)}>
-                      <TreasureBox />
-                    </div>
-                  )}
-                  <div className="task-content">
-                    {taskIndex + 1}：{tasks[taskIndex]?.content || ""}
-                    <span className="arrow">{taskIndex !== tasks.length - 1 && getArrow(taskIndex)}</span>
-                  </div>
-                  {taskIndex === tasks.length - 1 && <span className="goal-label">ゴール</span>}
-                </>
-              )}
-            </SugorokuCell>
+  {taskIndex < tasks.length && (
+    <>
+      {position === taskIndex && <Avatar />}
+      {treasurePositions.includes(taskIndex) && (
+        <div className="treasure-wrapper" onClick={() => handleTreasureClick(taskIndex)}>
+          <TreasureBox />
+        </div>
+      )}
+      <div className="task-content">
+        {taskIndex + 1}：{tasks[taskIndex]?.content || ""}
+        <span className="arrow">{taskIndex !== tasks.length - 1 && getArrow(taskIndex)}</span>
+      </div>
+      {/* スタートラベルをゴールラベルと同様に追加 */}
+      {taskIndex === 0 && <span className="start-label">スタート</span>}
+      {taskIndex === tasks.length - 1 && <span className="goal-label">ゴール</span>}
+    </>
+  )}
+</SugorokuCell>
+
           ))}
         </div>
       </div>
 
       <div className="move-buttons">
-        <button onClick={() => setPosition((prev) => Math.max(prev - 1, 0))} className="btn-back">もどる</button>
-        <button onClick={handleMoveForward} className="btn-forward">すすむ</button>
+        <button onClick={() => setPosition((prev) => Math.max(prev - 1, 0))} className="btn-back">
+          もどる
+        </button>
+        <button onClick={handleMoveForward} className="btn-forward">
+          すすむ
+        </button>
       </div>
     </div>
   );
