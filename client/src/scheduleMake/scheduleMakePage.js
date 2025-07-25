@@ -147,7 +147,7 @@ export default class ScheduleMakePage extends React.Component {
                         { date: '2025-08-12', content: '調査のかんそう', checked: false }
                     ], 
                     columnInfoId: 3,
-                    helpText: "興味のあるテーマを選んで調べたり実験しよう！観察日記や実験記録をつけることが大切！",
+                    helpText: "テーマを選んで調べたり実験しよう！観察日記や実験記録をつけることが大切！",
                     specialBookFlag: false
                 }
             ],
@@ -531,6 +531,7 @@ saveEachHomework = async (homework, vacationId) => {
                 </div>
 
                 {/* 課題補助 */}
+                <div className="hint-container"></div>
                 {showHelpText && (
                     <div className="hint">
                         <strong>宿題ヒント：</strong>
@@ -546,7 +547,10 @@ saveEachHomework = async (homework, vacationId) => {
                 )}
 
                 {/* 予定表 */}
+
                 <div>
+                    <div className="table-scroll-container">
+                    <div className="vertical-scroll-container">
                     <table id="scheduleTable">
                         <thead>
                             <tr>
@@ -633,12 +637,13 @@ saveEachHomework = async (homework, vacationId) => {
                         </tbody>
                     </table>
                 </div>
-
+            </div>
+    </div>
                 <div>
                     <button onClick={this.handleSave}>決定</button>
                 </div>
 
-   <button onClick={this.openModal}>推薦図書</button>
+   <text onClick={this.openModal}></text>
 
                 {this.state.showModal && (
                     <div id='modal'>

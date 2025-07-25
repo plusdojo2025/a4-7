@@ -2,7 +2,38 @@
     text-align: center;
 }
 
-.hint{
+/* ヒント */
+.hint-container {
+  min-height: 30px; 
+}
+.hint {
     background-color: rgba(255, 255, 255, 0.8);
     color: black;
+    text-align: center;
+    line-height: 40px;
+
 }
+
+/* 表 */
+.hint-scheduleTable
+ {
+  min-height: 30px; 
+}
+.addHwInput {
+    margin: 0 auto;
+}
+
+/* 縦スクロール */
+.vertical-scroll-container {
+  max-height: 900px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* ヘッダーを固定 */
+#scheduleTable thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f5f5f5; 
+}
+
