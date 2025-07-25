@@ -27,7 +27,8 @@ export default class BookRecommend extends React.Component{
             authorInfo:'',
             overviewInfo:'',
             pagesInfo:'',
-            indexInfo:''
+            indexInfo:'',
+            imageUrlTemp:""
         }
     }
 
@@ -37,7 +38,8 @@ export default class BookRecommend extends React.Component{
         .then(json=>{
             console.log(json)
             this.setState({
-                books1:json
+                books1:json,
+                imageUrlTemp: URL.createObjectURL(json.imageData)
             })
         });
         
@@ -181,7 +183,8 @@ export default class BookRecommend extends React.Component{
                             <p>1年生向け</p>
                             {books1.map((book,index)=>
                                 <div>
-                                     <button onClick={() => this.clickEvent1(index)}><img src="data:image/jpg;base64,${book.ImageData}"></img></button>
+                                     {/* <button onClick={() => this.clickEvent1(index)}><img src="{book.ImageData}"></img></button> */}
+                                     <button onClick={() => this.clickEvent1(index)}><img src="{this.state.imageUrlTemp}"></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}

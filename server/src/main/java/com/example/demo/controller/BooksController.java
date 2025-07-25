@@ -39,9 +39,21 @@ public class BooksController {
         }
     }
 	
-	@GetMapping("/book/grade1/")
+	@GetMapping("grade1/")
 	private List<Books> getG1(){
 		List<Books> data=repository.findByGrade(1);
+		for(int i=0;i<data.size();i++) {
+			ResponseEntity.BodyBuilder responseBuilder=ResponseEntity.ok();
+			responseBuilder.contentType(MediaType.IMAGE_JPEG);
+			ResponseEntity<byte[]> response=responseBuilder.body(data.get(i).getImage());
+			data.get(i).setImageData(response);
+		}
+        return data;
+	}
+
+	@GetMapping("grade2/")
+	private List<Books> getG2(){
+		List<Books> data=repository.findByGrade(2);
 		for(int i=0;i<data.size();i++) {
 			ResponseEntity.BodyBuilder responseBuilder=ResponseEntity.ok();
 			responseBuilder.contentType(MediaType.IMAGE_PNG);
@@ -50,29 +62,52 @@ public class BooksController {
 		}
         return data;
 	}
-
-	@GetMapping("/book/grade2/")
-	private List<Books> getG2(){
-		return repository.findByGrade(2);
-	}
 	
-	@GetMapping("/book/grade3/")
+	@GetMapping("grade3/")
 	private List<Books> getG3(){
-		return repository.findByGrade(3);
+		List<Books> data=repository.findByGrade(3);
+		for(int i=0;i<data.size();i++) {
+			ResponseEntity.BodyBuilder responseBuilder=ResponseEntity.ok();
+			responseBuilder.contentType(MediaType.IMAGE_PNG);
+			ResponseEntity<byte[]> response=responseBuilder.body(data.get(i).getImage());
+			data.get(i).setImageData(response);
+		}
+        return data;
 	}
 	
-	@GetMapping("/book/grade4/")
+	@GetMapping("grade4/")
 	private List<Books> getG4(){
-		return repository.findByGrade(4);
+		List<Books> data=repository.findByGrade(4);
+		for(int i=0;i<data.size();i++) {
+			ResponseEntity.BodyBuilder responseBuilder=ResponseEntity.ok();
+			responseBuilder.contentType(MediaType.IMAGE_PNG);
+			ResponseEntity<byte[]> response=responseBuilder.body(data.get(i).getImage());
+			data.get(i).setImageData(response);
+		}
+        return data;
 	}
 	
-	@GetMapping("/book/grade5/")
+	@GetMapping("grade5/")
 	private List<Books> getG5(){
-		return repository.findByGrade(5);
+		List<Books> data=repository.findByGrade(5);
+		for(int i=0;i<data.size();i++) {
+			ResponseEntity.BodyBuilder responseBuilder=ResponseEntity.ok();
+			responseBuilder.contentType(MediaType.IMAGE_PNG);
+			ResponseEntity<byte[]> response=responseBuilder.body(data.get(i).getImage());
+			data.get(i).setImageData(response);
+		}
+        return data;
 	}
 	
-	@GetMapping("/book/grade6/")
+	@GetMapping("grade6/")
 	private List<Books> getG6(){
-		return repository.findByGrade(6);
+		List<Books> data=repository.findByGrade(6);
+		for(int i=0;i<data.size();i++) {
+			ResponseEntity.BodyBuilder responseBuilder=ResponseEntity.ok();
+			responseBuilder.contentType(MediaType.IMAGE_PNG);
+			ResponseEntity<byte[]> response=responseBuilder.body(data.get(i).getImage());
+			data.get(i).setImageData(response);
+		}
+        return data;
 	}
 }
