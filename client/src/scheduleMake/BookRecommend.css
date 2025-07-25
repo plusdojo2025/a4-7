@@ -1,0 +1,22 @@
+.booklist{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.bookimg{
+    width:120px;
+    height: 160px;
+    border:none;
+}
+
+.bookbutton{
+    width:0;
+    height:0;
+    border:none;
+    padding:none;
+    margin:none;
+}
+
+.eachbook img{
+    justify-content: center;
+}

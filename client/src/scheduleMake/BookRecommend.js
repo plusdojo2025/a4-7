@@ -1,5 +1,5 @@
 import React from "react";
-//import './BookRecommend.css';
+import './BookRecommend.css';
 
 export default class BookRecommend extends React.Component{
     constructor(props){
@@ -218,13 +218,15 @@ export default class BookRecommend extends React.Component{
                     <div>
                         <div id="grade1">
                             <p>1年生向け</p>
+                            <div class="booklist">
                             {books1.map((book,index)=>
-                                <div>
-                                     <button onClick={() => this.clickEvent1(index)}><img src={book.ImageData}></img></button>
+                                <div class="eachbook">
+                                     <button class="bookbutton" onClick={() => this.clickEvent1(index)}><img src={book.ImageData} class="bookimg"></img></button>
                                      {/* <button onClick={() => this.clickEvent1(index)}><img src={this.state.imageUrlTemp}></img></button> */}
                                     <p>{book.name}</p>
                                 </div>
                             )}
+                            </div>
                             {this.state.isVisible1 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
@@ -235,12 +237,14 @@ export default class BookRecommend extends React.Component{
                         </div>
                         <div id="grade2">
                             <p>2年生向け</p>
+                            <div class="booklist">
                             {books2.map((book,index)=>
                                 <div>
                                     <button onClick={()=>this.clickEvent2(index)}><img src={book.ImageData}></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}
+                            </div>
                             {this.state.isVisible2 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
@@ -251,12 +255,14 @@ export default class BookRecommend extends React.Component{
                         </div>
                         <div id="grade3">
                             <p>3年生向け</p>
+                            <div class="booklist">
                             {books3.map((book,index)=>
                                 <div>
                                     <button onClick={()=>this.clickEvent3(index)}><img src={book.ImageData}></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}
+                            </div>
                             {this.state.isVisible3 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
@@ -267,12 +273,14 @@ export default class BookRecommend extends React.Component{
                         </div>
                         <div id="grade4">
                             <p>4年生向け</p>
+                            <div class="booklist">
                             {books4.map((book,index)=>
                                 <div>
                                     <button onClick={()=>this.clickEvent4(index)}><img src={book.ImageData}></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}
+                            </div>
                             {this.state.isVisible4 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
@@ -283,12 +291,14 @@ export default class BookRecommend extends React.Component{
                         </div>
                         <div id="grade5">
                             <p>5年生向け</p>
+                            <div class="booklist">
                             {books5.map((book,index)=>
                                 <div>
                                     <button onClick={()=>this.clickEvent5(index)}><img src={book.ImageData}></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}
+                            </div>
                             {this.state.isVisible5 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
@@ -299,12 +309,14 @@ export default class BookRecommend extends React.Component{
                         </div>
                         <div id="grade6">
                             <p>6年生向け</p>
+                            <div class="booklist">
                             {books6.map((book,index)=>
                                 <div>
                                     <button onClick={()=>this.clickEvent6(index)}><img src={book.ImageData}></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}
+                            </div>
                             {this.state.isVisible6 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
