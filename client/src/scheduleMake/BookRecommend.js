@@ -213,8 +213,8 @@ export default class BookRecommend extends React.Component{
 
         return(
             <div>
-                <button onClick={this.toggleModal}>本を選ぶ</button>
-                {showModal &&
+                {/*<button onClick={this.toggleModal}>本を選ぶ</button>
+                {showModal &&*/}
                     <div>
                         <div id="grade1">
                             <p>1年生向け</p>
@@ -230,7 +230,7 @@ export default class BookRecommend extends React.Component{
                             {this.state.isVisible1 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
-                                    <li>概要:{this.state.overviewInfo}</li>
+                                    <li>{this.state.overviewInfo}</li>
                                     <li>ページ数:{this.state.pagesInfo}</li>
                                 </ul>
                             }
@@ -248,7 +248,7 @@ export default class BookRecommend extends React.Component{
                             {this.state.isVisible2 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
-                                    <li>概要:{this.state.overviewInfo}</li>
+                                    <li>{this.state.overviewInfo}</li>
                                     <li>ページ数:{this.state.pagesInfo}</li>
                                 </ul>
                             }
@@ -266,7 +266,7 @@ export default class BookRecommend extends React.Component{
                             {this.state.isVisible3 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
-                                    <li>概要:{this.state.overviewInfo}</li>
+                                    <li>{this.state.overviewInfo}</li>
                                     <li>ページ数:{this.state.pagesInfo}</li>
                                 </ul>
                             }
@@ -284,7 +284,7 @@ export default class BookRecommend extends React.Component{
                             {this.state.isVisible4 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
-                                    <li>概要:{this.state.overviewInfo}</li>
+                                    <li>{this.state.overviewInfo}</li>
                                     <li>ページ数:{this.state.pagesInfo}</li>
                                 </ul>
                             }
@@ -302,7 +302,7 @@ export default class BookRecommend extends React.Component{
                             {this.state.isVisible5 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
-                                    <li>概要:{this.state.overviewInfo}</li>
+                                    <li>{this.state.overviewInfo}</li>
                                     <li>ページ数:{this.state.pagesInfo}</li>
                                 </ul>
                             }
@@ -320,14 +320,14 @@ export default class BookRecommend extends React.Component{
                             {this.state.isVisible6 && 
                                  <ul>
                                     <li>著者:{this.state.authorInfo}</li>
-                                    <li>概要:{this.state.overviewInfo}</li>
+                                    <li>{this.state.overviewInfo}</li>
                                     <li>ページ数:{this.state.pagesInfo}</li>
                                 </ul>
                             }
                         </div>
-                        <button onClick={this.toggleModal}>閉じる</button>
+                        {/*<button onClick={this.toggleModal}>閉じる</button>*/}
                     </div>
-                }
+                {/*}*/}
             </div>
         );
     }

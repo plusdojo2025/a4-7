@@ -1,3 +1,10 @@
+#modalContent{
+    max-width: inherit;
+    width:1000px;
+    height:500px;
+    overflow-y: scroll;
+}
+
 .booklist{
     display:grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -7,6 +14,8 @@
     width:120px;
     height: 160px;
     border:none;
+    position: relative;
+    right:50px;
 }
 
 .bookbutton{
@@ -17,6 +26,18 @@
     margin:none;
 }
 
-.eachbook img{
-    justify-content: center;
+#fixedbookclose img{
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    left: 110px;
+}
+
+#bookclose{
+    border:none;
+    border-radius:10px;
+    padding:5px;
+    width:150px;
+    background-color:darkslateblue;
+    color:azure;
 }
