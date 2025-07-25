@@ -27,8 +27,21 @@ export default class BookRecommend extends React.Component{
             authorInfo:'',
             overviewInfo:'',
             pagesInfo:'',
-            indexInfo:''
+            indexInfo:'',
+            imageUrlTemp:""
         }
+    }
+
+    // jsonデータからblob形式に変換し、blobから画像を再構成
+    ImageData2imageUrl = (imageData) => {
+        const base64String = imageData.body;
+        const mimeType = imageData.headers["Content-Type"][0];
+        const byteCharacters = atob(base64String);
+        const byteNumbers = Array.from(byteCharacters, char => char.charCodeAt(0));
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: mimeType });
+        const imageUrl = URL.createObjectURL(blob);
+        return imageUrl;
     }
 
     componentDidMount(){
@@ -36,6 +49,12 @@ export default class BookRecommend extends React.Component{
         .then(res=>res.json())
         .then(json=>{
             console.log(json)
+
+            json.map((book, idx) => {
+                const imageUrl = this.ImageData2imageUrl(book.ImageData)
+                json[idx].ImageData = imageUrl
+            })         
+            
             this.setState({
                 books1:json
             })
@@ -45,6 +64,10 @@ export default class BookRecommend extends React.Component{
         .then(res=>res.json())
         .then(json=>{
             console.log(json)
+            json.map((book, idx) => {
+                const imageUrl = this.ImageData2imageUrl(book.ImageData)
+                json[idx].ImageData = imageUrl
+            })     
             this.setState({
                 books2:json
             })
@@ -53,6 +76,10 @@ export default class BookRecommend extends React.Component{
         .then(res=>res.json())
         .then(json=>{
             console.log(json)
+            json.map((book, idx) => {
+                const imageUrl = this.ImageData2imageUrl(book.ImageData)
+                json[idx].ImageData = imageUrl
+            })     
             this.setState({
                 books3:json
             })
@@ -61,6 +88,10 @@ export default class BookRecommend extends React.Component{
         .then(res=>res.json())
         .then(json=>{
             console.log(json)
+            json.map((book, idx) => {
+                const imageUrl = this.ImageData2imageUrl(book.ImageData)
+                json[idx].ImageData = imageUrl
+            })     
             this.setState({
                 books4:json
             })
@@ -69,6 +100,10 @@ export default class BookRecommend extends React.Component{
         .then(res=>res.json())
         .then(json=>{
             console.log(json)
+            json.map((book, idx) => {
+                const imageUrl = this.ImageData2imageUrl(book.ImageData)
+                json[idx].ImageData = imageUrl
+            })     
             this.setState({
                 books5:json
             })
@@ -77,6 +112,10 @@ export default class BookRecommend extends React.Component{
         .then(res=>res.json())
         .then(json=>{
             console.log(json)
+            json.map((book, idx) => {
+                const imageUrl = this.ImageData2imageUrl(book.ImageData)
+                json[idx].ImageData = imageUrl
+            })     
             this.setState({
                 books6:json
             })
@@ -181,7 +220,8 @@ export default class BookRecommend extends React.Component{
                             <p>1年生向け</p>
                             {books1.map((book,index)=>
                                 <div>
-                                     <button onClick={() => this.clickEvent1(index)}><img src="data:image/jpg;base64,${book.ImageData}"></img></button>
+                                     <button onClick={() => this.clickEvent1(index)}><img src={book.ImageData}></img></button>
+                                     {/* <button onClick={() => this.clickEvent1(index)}><img src={this.state.imageUrlTemp}></img></button> */}
                                     <p>{book.name}</p>
                                 </div>
                             )}
@@ -197,7 +237,7 @@ export default class BookRecommend extends React.Component{
                             <p>2年生向け</p>
                             {books2.map((book,index)=>
                                 <div>
-                                    <button onClick={()=>this.clickEvent2(index)}>{book.image}</button>
+                                    <button onClick={()=>this.clickEvent2(index)}><img src={book.ImageData}></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}
@@ -213,7 +253,7 @@ export default class BookRecommend extends React.Component{
                             <p>3年生向け</p>
                             {books3.map((book,index)=>
                                 <div>
-                                    <button onClick={()=>this.clickEvent3(index)}>{book.image}</button>
+                                    <button onClick={()=>this.clickEvent3(index)}><img src={book.ImageData}></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}
@@ -229,7 +269,7 @@ export default class BookRecommend extends React.Component{
                             <p>4年生向け</p>
                             {books4.map((book,index)=>
                                 <div>
-                                    <button onClick={()=>this.clickEvent4(index)}>{book.image}</button>
+                                    <button onClick={()=>this.clickEvent4(index)}><img src={book.ImageData}></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}
@@ -245,7 +285,7 @@ export default class BookRecommend extends React.Component{
                             <p>5年生向け</p>
                             {books5.map((book,index)=>
                                 <div>
-                                    <button onClick={()=>this.clickEvent5(index)}>{book.image}</button>
+                                    <button onClick={()=>this.clickEvent5(index)}><img src={book.ImageData}></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}
@@ -261,7 +301,7 @@ export default class BookRecommend extends React.Component{
                             <p>6年生向け</p>
                             {books6.map((book,index)=>
                                 <div>
-                                    <button onClick={()=>this.clickEvent6(index)}>{book.image}</button>
+                                    <button onClick={()=>this.clickEvent6(index)}><img src={book.ImageData}></img></button>
                                     <p>{book.name}</p>
                                 </div>
                             )}

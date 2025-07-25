@@ -22,4 +22,5 @@ public class Evaluation {
 	private Integer id;
 	private Integer postId;		// ユニークキー
 	private Integer userId;		// ユニークキー　同じユーザーが同じ投稿に複数回いいねできないように
+	
 }

@@ -23,4 +23,5 @@ public class UserPost {
 	private Integer userId;
 	private String content;
 	private Integer count;
+	
 }

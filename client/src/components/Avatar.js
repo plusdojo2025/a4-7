@@ -6,8 +6,8 @@ export default class Avatar extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      userId:1,
-      avatarImgUrlList: [],
+      userId:2,
+      avatarImgUrlImgIdList: [],
       currentAvatarImgUrl: "",
       showModal: false
     }
@@ -16,32 +16,25 @@ export default class Avatar extends React.Component {
   componentDidMount = () => {
     const {userId} = this.state;
 
-
       // avatar画像を全取得
       axios.get('/user-images/useravatar/' + userId)
       .then(json => {
-        const imageIdList = [];
-        console.log(json.data)     
-        for (let uImgs of json.data) {
-          imageIdList.push(uImgs.imageId);
-        }
-  
-        for (let imgId of imageIdList) {
-          axios.get('/api/avatars/'+imgId, {responseType: 'blob'})
-          .then(blob => {
-            const imageUrl = URL.createObjectURL(blob.data);
-            this.setState({
-              avatarImgUrlList: [...this.state.avatarImgUrlList, imageUrl]
-            })
-          })
-          .catch(error => {
-          console.error('avatar画像の取得に失敗しました:', error);
+        const imageIdList = json.data.map(uImgs => uImgs.imageId);
+        return Promise.all( // 非同期の管理のためにPromiseを使用
+          imageIdList.map(imgId =>
+            axios.get('/api/avatars/' + imgId, { responseType: 'blob' })
+            .then(blob => [URL.createObjectURL(blob.data), imgId])
+          )
+        );
       })
-        }
+      .then(imageUrl_imageIds => {
+        this.setState({
+          avatarImgUrlImgIdList: imageUrl_imageIds
+        });
       })
       .catch(error => {
-          console.error('avatar画像の取得に失敗しました:', error);
-      })
+        console.error('avatar画像の取得に失敗しました:', error);
+      });
         
   
       // ユーザーの現在のアバター画像を取得
@@ -64,14 +57,69 @@ export default class Avatar extends React.Component {
 
   }
 
+  openModal = () => {
+        this.setState({
+            showModal: true
+        });
+    };
+
+  closeModal = () => {
+      this.setState({ showModal: false});
+  };
+
+  handleAvatarSelect = (imgId) => {
+    const {userId} = this.state;
+
+    axios.get("/users/" + userId)
+      .then(json => {
+        json.data.avatarId = imgId;
+        return json.data
+      })
+      .then(json => {
+        axios.post("/users", json)
+          .then(json => {
+            console.log(json.data)
+          })
+          .catch(error => {
+            console.error('ユーザー情報の更新に失敗しました:', error);
+          });
+      })
+      .then(_=> {this.componentDidMount()})
+      .then(_=> {this.setState({showModal: false})})
+  }
+
+
+
   render() {
-    const {avatarImgUrlList, currentAvatarImgUrl, showModal} = this.state;
+    const {avatarImgUrlImgIdList, currentAvatarImgUrl, showModal} = this.state;
     return (
       <div>
-        <img src={currentAvatarImgUrl} alt="アバター画像がありません。localhost:3000/testからアップロードしてね" className="avatar" />
+        <img
+          src={currentAvatarImgUrl || null}
+          alt="アバター画像がありません。localhost:3000/testからアップロードしてね"
+          className="avatar"
+          onClick={this.openModal}
+        />
+
         {/* アバター選択のモーダル表示 */}
         {showModal && (
-          <div></div>
+            <div id='modal'>
+              <div id='modalContent'>
+                <h3>アバターを選択してください</h3>
+                <div className="avatar-list">
+                  {avatarImgUrlImgIdList.map((url_id, index) => (
+                    <img
+                      key={index}
+                      src={url_id[0]}
+                      alt={`アバター${index + 1}`}
+                      className="avatar"
+                      onClick={() => this.handleAvatarSelect(url_id[1])}
+                    />
+                  ))}
+                </div>
+                <button onClick={this.closeModal}>閉じる</button>
+              </div>
+          </div>
         )}
       </div>
     );

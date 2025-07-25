@@ -9,16 +9,71 @@ export default class EventPage extends React.Component {
         super(props);
         // state
         this.state = {
-            loginUserId: 1,             // ログインユーザーのid　仮で1とする！！！！！！！！！！！！
+            loginUserId: 3,             // ログインユーザーのid　仮で1とする！！！！！！！！！！！！
             events: [],                 // セレクトボックスに表示するイベント用配列
             selectedEventIndex: 0,      // 選択中イベントの配列の添え字
             selectedEventTheme: "",     // 選択中のイベントテーマ
+            isPast: false,              // 選択中のイベントが終了済みか　デフォルトは開催中
             content: "",                // 投稿内容
-            like: false,                // いいねのステータス　デフォルトはいいねしてない状態
             posts: [],                  // 他の人の投稿を格納する配列
             isPosted: false,            // ログインユーザーの投稿状態　デフォルトは未投稿
             myLikeCount: 0,             // ログインユーザーの投稿についたいいね数
         }
+    }
+
+    // 選択されたイベント情報から投稿を取得
+    getPosts = (endDate, data) => {
+        // 今日の日付をyyyy-MM-dd形式で取得
+        let today = new Date();
+        today = today.toLocaleDateString('sv-SE');
+        // 選択中のイベント終了日をDate型のyyyy-MM--dd形式に変換
+        endDate = new Date(endDate).toLocaleDateString('sv-SE');
+
+        // 選択されたイベントが終了済みか
+        if (endDate < today) {                     // 終了済みの場合はいいね数の降順で取得
+            // 選択中イベントの全投稿取得
+            axios.post("/api/pastPostList/", data)
+            .then(response => {
+                console.log("他のユーザーの投稿");
+                console.log(response.data);
+                this.setState({
+                    posts: response.data,           // 選択中イベントの全投稿
+                    isPast: true                    // 選択中のイベント状況を終了済みに
+                });
+            })
+        } else {                                    // 開催中イベントの場合はidの降順で取得
+            // 選択中イベントの全投稿取得
+            axios.post("/api/postList/", data)
+            .then(response => {
+                console.log("他のユーザーの投稿");
+                console.log(response.data);
+                this.setState({
+                    posts: response.data,            // 選択中イベントの全投稿
+                    isPast: false                    // 選択中のイベント状況を開催中に
+                });
+            })
+        }
+
+        // ログインユーザーの投稿取得
+        axios.post("/api/myPost/", data)
+        .then(response => {
+            console.log("ログインユーザーの投稿");
+            // レスポンスの有無チェック
+            if (response.data != "") {          // レスポンスがある(=投稿済み)の場合
+                console.log(response.data);
+                this.setState({
+                    content: response.data.content,         // 投稿内容
+                    myLikeCount: response.data.count,       // 投稿についたいいね数
+                    isPosted: true                          // 投稿状態を投稿済みに
+                });
+            } else {
+                this.setState({
+                    content: "",                            // 投稿内容の初期化
+                    myLikeCount: 0,                         // いいね数の初期化
+                    isPosted: false                         // 投稿状態の初期化
+                });
+            }
+        })
     }
 
     // 初期表示
@@ -34,33 +89,12 @@ export default class EventPage extends React.Component {
                 selectedEventTheme: selectedEvent.theme     // 選択中イベントテーマ
             })
 
+            // 選択中イベントから投稿取得
             const data = {
                 eventId: selectedEvent.id,          // 選択中イベントid
                 userId: this.state.loginUserId      // ログインユーザーのid
             };
-            // 選択中イベントの全投稿取得
-            axios.post("/api/postList/", data)
-            .then(response => {
-                console.log("他のユーザーの投稿");
-                console.log(response.data);
-                this.setState({
-                    posts: response.data                    // 選択中イベントの全投稿
-                });
-            })
-            // ログインユーザーの投稿取得
-            axios.post("/api/myPost/", data)
-            .then(response => {
-                console.log("ログインユーザーの投稿");
-                // レスポンスの有無チェック
-                if (response.data != "") {          // レスポンスがある(=投稿済み)の場合
-                    console.log(response.data);
-                    this.setState({
-                        content: response.data.content,         // 投稿内容
-                        myLikeCount: response.data.count,       // 投稿についたいいね数
-                        isPosted: true                          // 投稿状態を投稿済みに
-                    });
-                }
-            })
+            this.getPosts(selectedEvent.endDate, data);     // イベント終了日と上のデータ渡す
         });
     }
 
@@ -72,16 +106,13 @@ export default class EventPage extends React.Component {
             selectedEventIndex: targetIndex,                // 選択中イベントの配列の添え字
             selectedEventTheme: events[targetIndex].theme   // 選択中イベントのテーマ
         });
-
-        // 選択中イベントの全投稿取得
-        const data = {eventId: events[targetIndex].id};       // 選択中イベントid
-        axios.post("/api/postList/", data)
-        .then(response => {
-            console.log(response.data);
-            this.setState({
-                posts: response.data            // 選択中イベントの全投稿
-            });
-        })
+        
+        // 選択中イベントから投稿取得
+        const data = {
+            eventId: events[targetIndex].id,        // 選択中イベントid
+            userId: this.state.loginUserId          // ログインユーザーのid
+        };
+        this.getPosts(events[targetIndex].endDate, data);     // イベント終了日と上のデータ渡す
     }
 
     // 入力時にstate更新
@@ -118,16 +149,34 @@ export default class EventPage extends React.Component {
     }
 
     // いいね
-    toggleLike = () => {
-        const like = this.state.like;
-        console.log(like);
-        this.setState({
-            like: !like
+    toggleLike = (index) => {
+        const {posts, loginUserId} = this.state;
+        const data = {
+            postId: posts[index].id,        // いいねボタンを押した投稿のid
+            userId: loginUserId             // ログインユーザーid
+        }
+        console.log(posts[index]);
+        console.log("index" + index + ", evaluation_id" + posts[index].evaluationId);
+        console.log(data);
+        // いいね登録・解除処理
+        axios.post("/api/changeEvaluation/", data)
+        .then(response => {
+            if (response.data != null) {
+                const newPosts = [...posts];            // 投稿配列のコピー
+                newPosts[index] = response.data;        // コピーした配列でいいね処理した投稿データ更新
+                console.log(response.data);
+                console.log(newPosts[index]);
+                this.setState({
+                    posts: newPosts             // 更新後の配列で更新
+                });
+            } else {
+                window.alert("いいねができませんでした");
+            }
         });
     }
 
     render() {
-        const {events, selectedEventIndex, selectedEventTheme, content, myLikeCount, isPosted, posts} = this.state;
+        const {events, selectedEventIndex, selectedEventTheme, isPast, content, myLikeCount, isPosted, posts} = this.state;
         return (
             <div id="event_page">
                 {/* メニューコンポーネント */}
@@ -146,14 +195,15 @@ export default class EventPage extends React.Component {
                 {/* 投稿 */}
                 <div className="container">
                     <div className="post_content">
-                        {/* disabled属性で投稿済みの場合は変更不可に */}
-                        <textarea name="content" id="content" placeholder="投稿内容" onChange={this.onInput} value={content} disabled={isPosted}/>
+                        {/* disabled属性で投稿済みの場合orイベントが終了している場合は入力不可に */}
+                        <textarea name="content" id="content" placeholder="投稿内容" onChange={this.onInput} value={content} disabled={isPosted || isPast}/>
                     </div>
                     <div className="post_footer">
                         {/* ログインユーザーが投稿済みの場合はいいね数、未投稿の場合は投稿ボタン表示 */}
                         {isPosted
                             ? <p>{myLikeCount}いいね</p>
-                            : <button onClick={this.addMyPost}>投稿</button>
+                            // イベントが終了している場合は投稿ボタンのクリックを無効に
+                            : <button disabled={isPast} onClick={this.addMyPost}>投稿</button>
                         }
                     </div>
                 </div>
@@ -170,7 +220,13 @@ export default class EventPage extends React.Component {
                                 </div>
                                 <div className="post_footer">
                                     <p>{post.count}</p>
-                                    <button onClick={this.toggleLike}>いいね！</button>
+                                    {/* イベントが終了している場合はいいねボタンのクリック無効に */}
+                                    <button disabled={isPast} onClick={() => {this.toggleLike(index)}}
+                                        className={post.evaluationId
+                                            ? "like"            // ログインユーザーのいいね状態でボタンデザイン変更
+                                            : "not_like"
+                                            }
+                                    >{post.evaluationId ? "いいね済み" : "いいね！"}</button>
                                 </div>
                             </div>
                         )}
