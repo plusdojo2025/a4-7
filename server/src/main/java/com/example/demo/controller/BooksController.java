@@ -44,7 +44,7 @@ public class BooksController {
 		List<Books> data=repository.findByGrade(1);
 		for(int i=0;i<data.size();i++) {
 			ResponseEntity.BodyBuilder responseBuilder=ResponseEntity.ok();
-			responseBuilder.contentType(MediaType.IMAGE_JPEG);
+			responseBuilder.contentType(MediaType.IMAGE_PNG);
 			ResponseEntity<byte[]> response=responseBuilder.body(data.get(i).getImage());
 			data.get(i).setImageData(response);
 		}
