@@ -2,11 +2,11 @@ import React from "react";
 import axios from 'axios';
 import "./SugorokuCell.css"; 
 
-export default class Avatar extends React.Component {
+class Avatar extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      userId:2,
+      userId: localStorage.getItem('userId') || "",
       avatarImgUrlImgIdList: [],
       currentAvatarImgUrl: "",
       showModal: false
@@ -126,3 +126,4 @@ export default class Avatar extends React.Component {
   }
 };
 
+export default (Avatar);

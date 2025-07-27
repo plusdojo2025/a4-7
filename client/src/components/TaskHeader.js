@@ -32,27 +32,32 @@ export default class TaskHeader extends React.Component {
 
     render() {
         const { taskList } = this.props;
-        if (!taskList || taskList.length === 0) {
-            return <div><h3>今日のタスク一覧</h3>タスクなし</div>;
-        }
+        
         return (
         <div className="task-header">
-            <h3>今日のタスク一覧</h3>
-            <div className="task-header-list">
-            <ol>
-                {taskList.sort((a, b) => a.contentOrder - b.contentOrder).map((content, index) => (
-                    <li key={index}>
-                        <input 
-                            type="checkbox" 
-                            checked={content.completed} 
-                            onChange={(e) => this.props.checkBoxChange(e, content)} 
-                        />
-                        {content.content}
-                    </li>
-                ))}
-            </ol>
-            </div>
-            <button onClick={()=>{this.rouletButtonClick(taskList)}}>ルーレット</button>
+            
+            {(!taskList || taskList.length === 0) ? 
+                <div><h3>今日のタスク一覧</h3>タスクなし</div> 
+                :
+                <div>
+                <h3>今日のタスク一覧</h3>
+                <div className="task-header-list">
+                <ol>
+                    {taskList.sort((a, b) => a.contentOrder - b.contentOrder).map((content, index) => (
+                        <li key={index}>
+                            {/* <input 
+                                type="checkbox" 
+                                checked={content.completed} 
+                                onChange={(e) => this.props.checkBoxChange(e, content)} 
+                            /> */}
+                            {content.content}
+                        </li>
+                    ))}
+                </ol>
+                </div>
+                <button onClick={()=>{this.rouletButtonClick(taskList)}}>ルーレット</button>
+                </div>
+            }
             
         </div>
         );

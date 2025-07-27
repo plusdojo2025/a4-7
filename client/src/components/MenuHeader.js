@@ -9,7 +9,7 @@ export default class Menu extends React.Component {
             {/* NavLinkは現在のURLとリンク先を比較して、
             「そのリンクが今表示されているページかどうか」を判断し、
             自動的にactiveクラスを付けてくれる。 */}
-            <NavLink to="/" end className="menu-item">
+            <NavLink to="/schedule" end className="menu-item">
                 ホーム
             </NavLink>
             <NavLink to="/event" className="menu-item">
@@ -18,7 +18,7 @@ export default class Menu extends React.Component {
             <NavLink to="/sugoroku" className="menu-item">
                 スゴロク
             </NavLink>
-            <NavLink to="/login" className="menu-item">
+            <NavLink to="/" className="menu-item">
                 ログアウト
             </NavLink>
             <NavLink to="/bookRecommend" className="menu-item">

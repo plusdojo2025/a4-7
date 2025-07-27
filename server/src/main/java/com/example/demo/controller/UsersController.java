@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,4 +60,38 @@ public class UsersController {
     public void deleteUser(@PathVariable Integer id) {
         usersRepository.deleteById(id);
     }
+    
+    
+    // ログイン処理
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Users loginRequest) {
+        Users user = usersRepository.findFirstByUsernameAndPassword(
+            loginRequest.getUsername(), loginRequest.getPassword()
+        );
+
+        // エラーハンドル
+        if (user == null) {
+            // 401 Unauthorized で返す
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 成功時はユーザーIDだけ返す
+        return ResponseEntity.ok(user.getId());
+    }
+    
+    // 新規登録処理
+    @PostMapping("/signup")
+    public ResponseEntity<Void> signupUser(@RequestBody Users user) {
+        if (usersRepository.findByUsername(user.getUsername()).isPresent()) {
+            // 409 Conflict
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        usersRepository.save(user);
+
+        // 登録成功は201 Created
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    
 }

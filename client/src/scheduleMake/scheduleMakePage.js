@@ -10,7 +10,7 @@ export default class ScheduleMakePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            usersId: this.props.usersId || 1,
+            usersId: localStorage.getItem('userId') || "",
             vacationStart: '2025-07-20',
             vacationEnd: '2025-08-31',
             selectedVacation: '夏休み',
@@ -205,6 +205,8 @@ handleSave = async () => {
             vacationName: this.state.selectedVacation,
             startDate: this.state.vacationStart,
             endDate: this.state.vacationEnd,
+            decisionDate: this.state.vacationStart,
+            currentLocation: 0
         };
 
         const vacationResponse = await axios.post('/api/vacations', saveData);
@@ -214,8 +216,10 @@ handleSave = async () => {
 
         await this.savePrivateSchedules(vacationId);
         await this.saveColumns(vacationId);
+        this.saveRewardBackgrounds(vacationId, saveData.vacationName);
 
-        window.location.href = '/';
+        window.location.href = '/schedule';
+        
     } catch (error) {
         alert('保存中にエラーが発生しました: ' + error.message);
     }
@@ -309,6 +313,30 @@ saveEachHomework = async (homework, vacationId) => {
     } catch (error) {
         throw error;
     }
+}
+
+saveRewardBackgrounds = (vacationId, vacationName) => {
+    const vacationsSwitch = { "夏休み": 0, "冬休み": 1, "春休み": 2 }[vacationName]; // DB用変数
+    if (vacationsSwitch === undefined) return console.error("無効な vacationName:", vacationName); 
+
+    // 季節ごとの報酬(背景画像)を取得
+    axios.get(`/vbgs/${vacationsSwitch}`)
+        .then(json => {
+            console.log("報酬データを取得：", json.data)
+            json.data.map((background, _) => {
+                const saveData = {
+                    vacationsId: vacationId,
+                    backgroundsId: background.id,
+                    isGain: 0,
+                    contentOrder: background.contentOrder
+                }
+
+                axios.post(`/uvbgs`, saveData)
+                    .then(json => console.log("報酬データの保存：", json.data))
+                    .catch(error => console.error('報酬データの保存に失敗しました:', error))
+            })
+        })
+        .catch(error =>  {console.error('報酬データの取得に失敗しました:', error);})
 }
 
     // 休暇が変更されたとき
@@ -449,9 +477,9 @@ saveEachHomework = async (homework, vacationId) => {
                               event.target.placeholder === '宿題内容を入力' &&
                               event.target.hasAttribute('data-fixed-hw');
         
-        if (!isFixedHwInput) {
-            this.hideHelpText();
-        }
+        // if (!isFixedHwInput) {
+        //     this.hideHelpText();
+        // }
     }
 
     // 指定した日付のプライベート予定を取得
@@ -489,7 +517,7 @@ saveEachHomework = async (homework, vacationId) => {
             fixedHwSchedulesList,
             additionalHwSchedulesList,
             showHelpText,
-            currentHelpText,
+            // currentHelpText,
             currentHwContent
         } = this.state;
         
@@ -497,8 +525,8 @@ saveEachHomework = async (homework, vacationId) => {
 
         return (
             <div>
-                <h1>予定作成</h1>
-                <Menu />
+                {/* <h1>予定作成</h1>
+                <Menu /> */}
                 
                 
 
@@ -550,8 +578,10 @@ saveEachHomework = async (homework, vacationId) => {
                 {/* 予定表 */}
 
                 <div>
-                    <div className="table-scroll-container">
-                    <div className="vertical-scroll-container">
+                    <div id="scheduleOuterContainer">
+                    <div id="scheduleContainer">
+                    {/* <div className="table-scroll-container">
+                    <div className="vertical-scroll-container"> */}
                     <table id="scheduleTable">
                         <thead>
                             <tr>
@@ -637,6 +667,8 @@ saveEachHomework = async (homework, vacationId) => {
                             ))}
                         </tbody>
                     </table>
+                {/* </div>
+                </div> */}
                 </div>
             </div>
     </div>

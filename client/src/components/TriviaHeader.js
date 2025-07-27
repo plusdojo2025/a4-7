@@ -10,7 +10,8 @@ export default class TriviaHeader extends React.Component {
         this.state = {
             // today: "2025-07-30",
             today: props.today,
-            trivia: ""
+            trivia: "",
+            setToday: props.setToday
         };
     }
 
@@ -36,14 +37,24 @@ export default class TriviaHeader extends React.Component {
             });
     }
 
+    handleDateChange = (e) => {
+        const selectedDate = e.target.value; // yyyy-mm-dd 形式
+        this.state.setToday(selectedDate);
+        this.setState({today: selectedDate});
+    };
+
     render(){
-        const { trivia } = this.state;
+        const { trivia, today} = this.state;
         return (
             <div className="trivia-header">
                 <div className="trivia-content">
                     <Avatar />
                     <p className='balloon-008'>{trivia ? trivia.content : "豆知識はまだありません。"}</p>
-                </div>              
+                </div>
+                <div>
+                    <label>日付を選択してください：</label>
+                    <input type="date" value={today} onChange={this.handleDateChange} />
+                </div>      
             </div>
         );
 

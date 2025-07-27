@@ -29,6 +29,43 @@ insert into vacations (user_id, vacation_name, start_date, end_date, decision_da
 (1, '冬休み', '2024-12-20', '2025-01-10', '2024-12-20', 0),
 (1, '春休み', '2024-03-20', '2024-04-01', '2024-03-20', 0);
 
+insert into user_vacation_backgrounds (vacations_id, backgrounds_id, is_gain, content_order) values
+(1, 1, 0, 1),
+(1, 2, 0, 2),
+(1, 3, 0, 3),
+(1, 4, 0, 4),
+(2, 1, 0, 1),
+(2, 2, 0, 2),
+(2, 3, 0, 3),
+(2, 4, 0, 4),
+(3, 1, 0, 1),
+(3, 2, 0, 2),
+(3, 3, 0, 3),
+(3, 4, 0, 4),
+(4, 5, 0, 1),
+(4, 6, 0, 2),
+(4, 7, 0, 3),
+(4, 8, 0, 4),
+(5, 9, 0, 1),
+(5, 10, 0, 2),
+(5, 11, 0, 3),
+(5, 12, 0, 4);
+
+
+insert into vacation_backgrounds (vacation_switch, backgrounds_id, content_order) values
+(0, 1, 1), -- 夏休み
+(0, 2, 2),
+(0, 3, 3),
+(0, 4, 4),
+(1, 5, 1), -- 冬休み
+(1, 6, 2),
+(1, 7, 3),
+(1, 8, 4),
+(2, 9, 1), -- 春休み
+(2, 10, 2),
+(2, 11, 3),
+(2, 12, 4);
+
 -- private_schedulesテーブル
 insert into private_schedules (user_id, content, content_date, vacation_id) values
 (1, 'じゅく', '2025-07-20', 1),
