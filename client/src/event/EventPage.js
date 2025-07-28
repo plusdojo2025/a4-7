@@ -141,12 +141,18 @@ export default class EventPage extends React.Component {
 
     // 投稿内容登録
     addMyPost = () => {
+        const {loginUserId, events, selectedEventIndex, myLikeCount, content} = this.state;     // stateから必要な情報取得
+
         // 投稿確認ダイアログ表示　キャンセルの場合は登録処理をせずに返す
-        if (!window.confirm("投稿はイベントにつき1回だけできます。投稿しますか？")) {
+        if (!window.confirm("とうこうはイベントにつき1回だけできます。とうこうしますか？")) {
+            return;
+        }
+        // 入力欄が空の場合
+        if (content == "") {
+            window.alert("とうこうをかいてね");
             return;
         }
 
-        const {loginUserId, events, selectedEventIndex, myLikeCount, content} = this.state;     // stateから必要な情報取得
         const userPost = {
             eventId: events[selectedEventIndex].id,     // 選択中イベントのid
             userId: loginUserId,                        // ログインユーザーid
@@ -201,27 +207,27 @@ export default class EventPage extends React.Component {
                 </select>
 
                 {/* イベントテーマ */}
-                <h2>お題：{selectedEventTheme}</h2>
+                <h2>テーマ：{selectedEventTheme}</h2>
 
                 {/* 投稿 */}
                 <div className="container">
                     <div className="post_content">
                         {/* disabled属性で投稿済みの場合orイベントが終了している場合は入力不可に */}
-                        <textarea name="content" id="content" placeholder="投稿内容" onChange={this.onInput} value={content} disabled={isPosted || isPast}/>
+                        <textarea name="content" id="content" placeholder="とうこうないよう" onChange={this.onInput} value={content} disabled={isPosted || isPast}/>
                     </div>
                     <div className="post_footer">
                         {/* ログインユーザーが投稿済みの場合はいいね数、未投稿の場合は投稿ボタン表示 */}
                         {isPosted
                             ? <p>{myLikeCount}いいね</p>
                             // イベントが終了している場合は投稿ボタンのクリックを無効に
-                            : <button disabled={isPast} onClick={this.addMyPost}>投稿</button>
+                            : <button disabled={isPast} onClick={this.addMyPost}>とうこう</button>
                         }
                     </div>
                 </div>
                 
                 {/* 投稿一覧 */}
                 <div id="other">
-                    <h3>他の人の投稿内容</h3>
+                    <h3>みんなのとうこう</h3>
 
                     <div className="container">
                         {posts.map((post, index) =>
