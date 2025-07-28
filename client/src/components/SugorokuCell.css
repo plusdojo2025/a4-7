@@ -19,6 +19,49 @@
   color: #333;
 }
 
+.arrow {
+  position: absolute;
+  width: 0; 
+  height: 0; 
+  border-style: solid;
+}
+
+.arrow-right {
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 7.5px 0 7.5px 15px;
+  border-color: transparent transparent transparent #746b6b;
+}
+
+.arrow-down {
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-style: solid;
+  border-width: 15px 7.5px 0 7.5px;
+  border-color: #746b6b transparent transparent transparent;
+}
+
+.arrow-left {
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 7.5px 15px 7.5px 0;
+  border-color: transparent #746b6b transparent transparent;
+}
+
+.arrow-up {
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-style: solid;
+  border-width: 0 7.5px 15px 7.5px;
+  border-color: transparent transparent #746b6b transparent;
+}
+
 /* Avatar.css */
 .avatar {
   width: 100px;
