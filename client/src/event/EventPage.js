@@ -1,7 +1,4 @@
 import React from "react";
-import Menu from '../components/MenuHeader';
-import TaskHeader from '../components/TaskHeader';
-import TriviaHeader from '../components/TriviaHeader';
 import './eventPage.css';
 import axios from "axios";
 
@@ -11,13 +8,8 @@ export default class EventPage extends React.Component {
         super(props);
         // state
         this.state = {
-            loginUserId: localStorage.getItem('userId') || "",             // ログインユーザーのid　仮で1とする！！！！！！！！！！！！
+            loginUserId: localStorage.getItem('userId') || "",             // ログインユーザーのid
             backgroundUrl: '',          // 背景画像用url
-            // vacations: [], 
-            // privateSchedules: [],
-            // columns: [],
-            // hwSchedules: [],
-            // selectedVacationIdx: 0,
             events: [],                 // セレクトボックスに表示するイベント用配列
             selectedEventIndex: 0,      // 選択中イベントの配列の添え字
             selectedEventTheme: "",     // 選択中のイベントテーマ
@@ -100,45 +92,6 @@ export default class EventPage extends React.Component {
         .catch(error => {
             console.error('背景画像の取得に失敗しました:', error);
         })
-
-        // // まずは休暇情報を取得
-        // axios.get('/api/vacations/user/' + loginUserId)
-        // .then(json => {
-        //     console.log(json.data);
-        //     this.setState({
-        //         vacations: json.data,
-        //     }, () => {                
-        //         // TODO: 複数fetchをまとめて実行する方法を検討
-        //         // 休暇情報を取得した後に、選択された休暇の予定(私用・宿題)を取得
-        //         fetch("/privateSchedules/?userId="+loginUserId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
-        //         .then(response => {return response.json()})
-        //         .then (json => {
-        //             console.log(json);  
-        //             this.setState({
-        //                 privateSchedules: json
-        //             });
-        //         });
-                
-        //         fetch("/columns/?userId="+loginUserId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
-        //         .then(response => {return response.json()})
-        //         .then (json => {
-        //             console.log(json);  
-        //             this.setState({
-        //                 columns: json
-        //             });
-        //         });
-
-        //         fetch("/homeworkSchedules/?userId="+loginUserId+"&vacationId="+this.state.vacations[selectedVacationIdx].id)
-        //         .then(response => {return response.json()})
-        //         .then (json => {
-        //             console.log(json);  
-        //             this.setState({
-        //                 hwSchedules: json
-        //             });
-        //         });
-        //     }
-        //     );
-        // })
 
         // セレクトボックス用のイベント一覧取得
         fetch("/api/eventList/")
@@ -233,32 +186,13 @@ export default class EventPage extends React.Component {
     }
 
     render() {
-        const {backgroundUrl,
-            vacations, 
-            hwSchedules,
-            selectedVacationIdx,
-            events, selectedEventIndex, selectedEventTheme, isPast, content, myLikeCount, isPosted, posts} = this.state;
+        const {backgroundUrl, events, selectedEventIndex, selectedEventTheme, isPast, content, myLikeCount, isPosted, posts} = this.state;
         return (
             <div id="event_page"  className='backgroundImage' style={
                 backgroundUrl
                 ? { backgroundImage: `url(${backgroundUrl})` }
                 : { backgroundColor: "#282c34" } // fallback 背景
             }>
-                {/* メニューコンポーネント */}
-                {/*
-                <ul id='header'>
-                    <li><TriviaHeader today={vacations[selectedVacationIdx].decisionDate}/></li>
-                    <li><h1>Schedule Page</h1></li>
-                    <li>
-                        <TaskHeader 
-                            taskList={hwSchedules.filter(content => content.contentDate === vacations[selectedVacationIdx].decisionDate)}
-                            checkBoxChange={this.handleCheckboxChange}                     
-                        />
-                    </li>
-                </ul>
-                */}
-                {/* <Menu></Menu> */}
-
                 {/* 表示イベント選択セレクトボックス　デフォルトは現在開催中のイベント */}
                 <select value={selectedEventIndex} onChange={this.changeEvent}>
                     {events.map((event, index) =>

@@ -1,5 +1,6 @@
-#event_page {
-    
+#event_page h2, #event_page h3 {
+    background-color: rgba(240, 240, 240, 0.7);
+    color: #333333;
 }
 .backgroundImage {
     width: 100%;
@@ -18,11 +19,14 @@
 .post_content {
     background-color: #ffffff;
     color: #000000;
-    border: 1px solid #000000;
+    box-shadow: 2px 2px 5px #999999;
     height: 140px;
     padding: 5px;
     box-sizing: border-box;
     text-align: center;
+}
+#event_page .post_content p {
+    background-color: #ffffff;
 }
 #content {
     padding: 0;
@@ -34,13 +38,18 @@
 }
 .post_footer {
     text-align: right;
+    background-color: rgba(240, 240, 240, 0.6);
+    padding: 5px;
 }
 .post_footer p {
-    margin: 5px;
+    margin: 0;
+    color: #333333;
 }
 .post_footer button {
     height: 35px;
     width: 90px;
+    border-radius:5px;
+    border: none;
 }
 .post_footer button:hover {
     cursor: pointer;
@@ -65,7 +74,4 @@
 }
 .post_footer .like {
     width: 120px;
-}
-.post_footer .not_like {
-    
 }
