@@ -238,7 +238,7 @@ export default class BookRecommend extends React.Component{
                     <div>
                         <div id="grade1">
                             <div class="forgrade">
-                            <p>1年生向け</p>
+                            <p>1ねんせいむけ</p>
                             </div>
                             <div class="booklist">
                             {books1.map((book,index)=>
@@ -249,17 +249,19 @@ export default class BookRecommend extends React.Component{
                                 </div>
                             )}
                             </div>
-                            {this.state.isVisible1 && 
-                                 <ul>
-                                    <li>著者:{this.state.authorInfo1}</li>
-                                    <li>{this.state.overviewInfo1}</li>
-                                    <li>ページ数:{this.state.pagesInfo1}</li>
-                                </ul>
-                            }
+                            <div class="bookcontent">
+                                {this.state.isVisible1 && 
+                                    <ul>
+                                        <li>さくしゃ:{this.state.authorInfo1}</li>
+                                        <li>{this.state.overviewInfo1}</li>
+                                        <li>ページすう:{this.state.pagesInfo1}</li>
+                                    </ul>
+                                }
+                            </div>
                         </div>
                         <div id="grade2">
                             <div class="forgrade">
-                            <p>2年生向け</p>
+                            <p>2年生むけ</p>
                             </div>
                             <div class="booklist">
                             {books2.map((book,index)=>
@@ -269,17 +271,19 @@ export default class BookRecommend extends React.Component{
                                 </div>
                             )}
                             </div>
-                            {this.state.isVisible2 && 
-                                 <ul>
-                                    <li>著者:{this.state.authorInfo2}</li>
-                                    <li>{this.state.overviewInfo2}</li>
-                                    <li>ページ数:{this.state.pagesInfo2}</li>
-                                </ul>
-                            }
+                            <div class="bookcontent">
+                                {this.state.isVisible2 && 
+                                    <ul>
+                                        <li>さくしゃ:{this.state.authorInfo2}</li>
+                                        <li>{this.state.overviewInfo2}</li>
+                                        <li>ページすう:{this.state.pagesInfo2}</li>
+                                    </ul>
+                                }
+                            </div>
                         </div>
                         <div id="grade3">
                             <div class="forgrade">
-                            <p>3年生向け</p>
+                            <p>3年生むけ</p>
                             </div>
                             <div class="booklist">
                             {books3.map((book,index)=>
@@ -289,13 +293,15 @@ export default class BookRecommend extends React.Component{
                                 </div>
                             )}
                             </div>
-                            {this.state.isVisible3 && 
-                                 <ul>
-                                    <li>著者:{this.state.authorInfo3}</li>
-                                    <li>{this.state.overviewInfo3}</li>
-                                    <li>ページ数:{this.state.pagesInfo3}</li>
-                                </ul>
-                            }
+                            <div class="bookcontent">
+                                {this.state.isVisible3 && 
+                                    <ul>
+                                        <li>作者:{this.state.authorInfo3}</li>
+                                        <li>{this.state.overviewInfo3}</li>
+                                        <li>ページ数:{this.state.pagesInfo3}</li>
+                                    </ul>
+                                }
+                            </div>
                         </div>
                         <div id="grade4">
                             <div class="forgrade">
@@ -309,13 +315,15 @@ export default class BookRecommend extends React.Component{
                                 </div>
                             )}
                             </div>
-                            {this.state.isVisible4 && 
-                                 <ul>
-                                    <li>著者:{this.state.authorInfo4}</li>
-                                    <li>{this.state.overviewInfo4}</li>
-                                    <li>ページ数:{this.state.pagesInfo4}</li>
-                                </ul>
-                            }
+                            <div class="bookcontent">
+                                {this.state.isVisible4 && 
+                                    <ul>
+                                        <li>作者:{this.state.authorInfo4}</li>
+                                        <li>{this.state.overviewInfo4}</li>
+                                        <li>ページ数:{this.state.pagesInfo4}</li>
+                                    </ul>
+                                }
+                            </div>
                         </div>
                         <div id="grade5">
                             <div class="forgrade">
@@ -329,13 +337,15 @@ export default class BookRecommend extends React.Component{
                                 </div>
                             )}
                             </div>
-                            {this.state.isVisible5 && 
-                                 <ul>
-                                    <li>著者:{this.state.authorInfo5}</li>
-                                    <li>{this.state.overviewInfo5}</li>
-                                    <li>ページ数:{this.state.pagesInfo5}</li>
-                                </ul>
-                            }
+                            <div class="bookcontent">
+                                {this.state.isVisible5 && 
+                                    <ul>
+                                        <li>作者:{this.state.authorInfo5}</li>
+                                        <li>{this.state.overviewInfo5}</li>
+                                        <li>ページ数:{this.state.pagesInfo5}</li>
+                                    </ul>
+                                }
+                            </div>
                         </div>
                         <div id="grade6">
                             <div class="forgrade">
@@ -349,13 +359,15 @@ export default class BookRecommend extends React.Component{
                                 </div>
                             )}
                             </div>
-                            {this.state.isVisible6 && 
-                                 <ul>
-                                    <li>著者:{this.state.authorInfo6}</li>
-                                    <li>{this.state.overviewInfo6}</li>
-                                    <li>ページ数:{this.state.pagesInfo6}</li>
-                                </ul>
-                            }
+                            <div class="bookcontent">
+                                {this.state.isVisible6 && 
+                                    <ul>
+                                        <li>著者:{this.state.authorInfo6}</li>
+                                        <li>{this.state.overviewInfo6}</li>
+                                        <li>ページ数:{this.state.pagesInfo6}</li>
+                                    </ul>
+                                }
+                            </div>
                         </div>
                         {/*<button onClick={this.toggleModal}>閉じる</button>*/}
                     </div>
