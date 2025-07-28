@@ -1,6 +1,7 @@
 import React from "react";
 import axios from 'axios';
 import "./SugorokuCell.css"; 
+import "./Avatar.css"
 
 class Avatar extends React.Component {
   constructor(props){
@@ -104,7 +105,7 @@ class Avatar extends React.Component {
         {/* アバター選択のモーダル表示 */}
         {showModal && (
             <div id='modal'>
-              <div id='modalContent'>
+              <div id='modalContent-avatar'>
                 <h3>アバターを選択してください</h3>
                 <div className="avatar-list">
                   {avatarImgUrlImgIdList.map((url_id, index) => (

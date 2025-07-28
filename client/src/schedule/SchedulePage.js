@@ -40,13 +40,27 @@ class SchedulePage extends React.Component {
         };
     }
 
+    // componentDidUpdate(prevProps, prevState) {
+    //     // props.today が変わったかを検知
+    //     // console.log("prevProps",prevProps.today);
+    //     // console.log("prevState",prevState.today);
+    //     // console.log("this.props.today",this.props.today);
+    //     // console.log("this.state.today",this.state.today);
+    //     // if (prevState.today !== this.state.today) {
+    //     //     console.log("todayが変更されました:", this.props.today);
 
+    //         // // 例: todayに基づいてタスクを更新する処理
+    //         // this.props.setTodayTasks(this.props.today);
+            
+    //         // // 必要に応じて state に反映
+    //         // this.setState({ today: this.props.today });
+    //     }
+    // }
 
 
     // --------------------------------------------------------------
     componentDidMount() {
-
-        const {userId} = this.state;
+        const {userId, today} = this.state;
         if (!userId) {
             //alert('ログインしてください');
             window.location.href = '/';
@@ -103,7 +117,13 @@ class SchedulePage extends React.Component {
                 }
             }
             );
-        })     
+        })   
+        // .then(_=>{
+        //     // 日付が変わった時のモーダル表示
+        //     this.dicisionBotton(today);
+        // })  
+
+        
     }
     
 
@@ -140,6 +160,9 @@ class SchedulePage extends React.Component {
                     hwSchedules: json
                 });
                 setTodayTasks(json.filter(content => content.contentDate === today))
+            })
+            .catch(error => {
+            console.error("宿題取得エラー:", error);
             });
         
             
@@ -345,6 +368,7 @@ class SchedulePage extends React.Component {
 
     // 休暇の決定ボタンが押されたときの処理
     dicisionBotton = (date) => {
+        console.log("modal", date)
         const { userId, vacationId, vacations, hwSchedules} = this.state;
         const requests = [];
         const modalData = [];
@@ -356,11 +380,11 @@ class SchedulePage extends React.Component {
         const nextDate = nextDateTemp.toISOString().split('T')[0]; // YYYY-MM-DD形式       
 
         // 休暇テーブルの決定日(dicision_date)を次の日に移行         
-        const updatedVacation = { ...vacations[vacationId], decisionDate: nextDate};
-        requests.push(
-            axios.post('/api/vacations/mod/', updatedVacation)
-            .then (json => {console.log(json);})
-        );
+        // const updatedVacation = { ...vacations[vacationId], decisionDate: nextDate};
+        // requests.push(
+        //     axios.post('/api/vacations/mod/', updatedVacation)
+        //     .then (json => {console.log(json);})
+        // );
 
         // チェックされていない今日の宿題タスクを次の日に移行する
         hwSchedules.filter(content => content.contentDate === date && !content.completed).forEach(content => {
@@ -419,6 +443,20 @@ class SchedulePage extends React.Component {
             this.setHomeworkSchedules(userId, vacationId);
         })
         .catch(error => {console.error("APIエラー:", error);});
+    }
+
+    // --------------------------------------------------------------   
+    setAllCheck = () => {
+        const {hwSchedules, userId, vacationId} = this.state;
+        hwSchedules.map((hwSchedule, _) => {
+            const checkedHwSchedule = {...hwSchedule, completed:1}
+            console.log("チェック", checkedHwSchedule);
+            axios.post('/homeworkSchedules/mod/', checkedHwSchedule)
+            .then (json => {
+                console.log(json);
+                this.setHomeworkSchedules(userId, vacationId);
+            });
+        })
     }
 
     // main -----------------------------------------------------------   
@@ -523,6 +561,7 @@ class SchedulePage extends React.Component {
                             {columns.map((col, index) => ( 
                                 <th key={index}>{col.columnTitle}</th>
                             ))}
+                            <th><button onClick={this.setAllCheck}>全チェック</button></th>
 
                         </tr>
                     </thead>
@@ -618,9 +657,9 @@ class SchedulePage extends React.Component {
                                 ))}
 
                                 {
-                                    vacations[vacationId].decisionDate === date.date ? (
-                                        <td><button onClick={()=>{this.dicisionBotton(date.date)}}>次の日へ</button></td>
-                                    ) : null
+                                    // vacations[vacationId].decisionDate === date.date ? (
+                                    //     <td><button onClick={()=>{this.dicisionBotton(date.date)}}>次の日へ</button></td>
+                                    // ) : null
                                 }
 
                                 

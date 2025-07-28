@@ -216,7 +216,7 @@ handleSave = async () => {
 
         await this.savePrivateSchedules(vacationId);
         await this.saveColumns(vacationId);
-        this.saveRewardBackgrounds(vacationId, saveData.vacationName);
+        await this.saveRewardBackgrounds(vacationId, saveData.vacationName);
 
         window.location.href = '/schedule';
         
@@ -315,28 +315,41 @@ saveEachHomework = async (homework, vacationId) => {
     }
 }
 
-saveRewardBackgrounds = (vacationId, vacationName) => {
-    const vacationsSwitch = { "夏休み": 0, "冬休み": 1, "春休み": 2 }[vacationName]; // DB用変数
-    if (vacationsSwitch === undefined) return console.error("無効な vacationName:", vacationName); 
+saveRewardBackgrounds = async (vacationId, vacationName) => {
 
-    // 季節ごとの報酬(背景画像)を取得
-    axios.get(`/vbgs/${vacationsSwitch}`)
-        .then(json => {
-            console.log("報酬データを取得：", json.data)
-            json.data.map((background, _) => {
-                const saveData = {
-                    vacationsId: vacationId,
-                    backgroundsId: background.id,
-                    isGain: 0,
-                    contentOrder: background.contentOrder
-                }
+    try {
+        const vacationsSwitch = { "夏休み": 0, "冬休み": 1, "春休み": 2 }[vacationName];
+        if (vacationsSwitch === undefined) {
+            console.error("無効な vacationName:", vacationName);
+            return;
+        }
 
-                axios.post(`/uvbgs`, saveData)
-                    .then(json => console.log("報酬データの保存：", json.data))
-                    .catch(error => console.error('報酬データの保存に失敗しました:', error))
-            })
-        })
-        .catch(error =>  {console.error('報酬データの取得に失敗しました:', error);})
+        // 報酬データの取得
+        const res = await axios.get(`/vbgs/${vacationsSwitch}`);
+        const rewardData = res.data;
+        console.log("報酬データを取得：", rewardData);
+
+        // 各背景の保存を順次待つ（または Promise.all で並列）
+        const savePromises = rewardData.map((background) => {
+            return axios.post(`/uvbgs`, {
+                vacationsId: vacationId,
+                backgroundsId: background.id,
+                isGain: 0,
+                contentOrder: background.contentOrder
+            }).then(res => {
+                console.log("報酬データの保存：", res.data);
+            }).catch(error => {
+                console.error('報酬データの保存に失敗しました:', error);
+                throw error; 
+            });
+        });
+
+        await Promise.all(savePromises); // すべてのPOSTの完了を待つ
+
+    } catch (error) {
+        console.error('saveRewardBackgrounds内でエラー:', error);
+        throw error;
+    }
 }
 
     // 休暇が変更されたとき
