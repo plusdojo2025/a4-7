@@ -163,15 +163,15 @@ export default class ScheduleMakePage extends React.Component {
                             { date: '2025-08-04', content: 'ワーク 20～22', checked: false },
                             { date: '2025-08-06', content: 'ワーク 24～25', checked: false },
 
-                            { date: '2025-12-27', content: 'ワーク 10～12', checked: false },
-                            { date: '2025-12-30', content: 'ワーク 13～15', checked: false },
-                            { date: '2026-01-02', content: 'ワーク 20～22', checked: false },
-                            { date: '2026-01-04', content: 'ワーク 24～25', checked: false },
+                            // { date: '2025-12-27', content: 'ワーク 10～12', checked: false },
+                            // { date: '2025-12-30', content: 'ワーク 13～15', checked: false },
+                            // { date: '2026-01-02', content: 'ワーク 20～22', checked: false },
+                            // { date: '2026-01-04', content: 'ワーク 24～25', checked: false },
 
-                            { date: '2026-03-27', content: 'ワーク 10～12', checked: false },
-                            { date: '2026-03-29', content: 'ワーク 13～15', checked: false },
-                            { date: '2026-03-30', content: 'ワーク 20～22', checked: false },
-                            { date: '2026-04-01', content: 'ワーク 24～25', checked: false }
+                            // { date: '2026-03-27', content: 'ワーク 10～12', checked: false },
+                            // { date: '2026-03-29', content: 'ワーク 13～15', checked: false },
+                            // { date: '2026-03-30', content: 'ワーク 20～22', checked: false },
+                            // { date: '2026-04-01', content: 'ワーク 24～25', checked: false }
                     ], 
                     columnInfoId: 4, 
                     helpText: "学校で配られたワークを進めよう！1日2〜3ページずつ取り組むのがおすすめ！",

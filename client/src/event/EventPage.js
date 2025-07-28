@@ -11,7 +11,7 @@ export default class EventPage extends React.Component {
         super(props);
         // state
         this.state = {
-            loginUserId: 3,             // ログインユーザーのid　仮で1とする！！！！！！！！！！！！
+            loginUserId: localStorage.getItem('userId') || "",             // ログインユーザーのid　仮で1とする！！！！！！！！！！！！
             backgroundUrl: '',          // 背景画像用url
             // vacations: [], 
             // privateSchedules: [],
@@ -257,7 +257,7 @@ export default class EventPage extends React.Component {
                     </li>
                 </ul>
                 */}
-                <Menu></Menu>
+                {/* <Menu></Menu> */}
 
                 {/* 表示イベント選択セレクトボックス　デフォルトは現在開催中のイベント */}
                 <select value={selectedEventIndex} onChange={this.changeEvent}>
