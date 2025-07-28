@@ -6,6 +6,7 @@ import TreasureBox from "../components/TreasureBox";
 import MenuHeader from "../components/MenuHeader";
 import TriviaHeader from '../components/TriviaHeader';
 import Header from '../components/Header'
+import "../components/Background.css";
 
 import "./SugorokuPage.css";
 import { withRouter } from "../withRouter";
@@ -387,28 +388,27 @@ const SugorokuPage = ({changeBackground}) => {
   // };
 
   // // 矢印表示（隣接セル方向）
-  // const getArrow = (index) => {
-  //   if (index >= tasks.length) return "";
-  //   const nextIndex = index + 1;
-  //   for (let r = 0; r < size; r++) {
-  //     for (let c = 0; c < size; c++) {
-  //       if (spiral[r][c] === index) {
-  //         const directions = [
-  //           [0, 1],
-  //           [1, 0],
-  //           [0, -1],
-  //           [-1, 0],
-  //         ];
-  //         for (let d = 0; d < 4; d++) {
-  //           const [dr, dc] = directions[d];
-  //           if (spiral[r + dr]?.[c + dc] === nextIndex) return ["→", "↓", "←", "↑"][d];
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return "";
-  // };
-
+  const getDirection = (index) => {
+  if (index >= tasks.length) return null; // 最後は矢印なし
+  const nextIndex = index + 1;
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (spiral[r][c] === index) {
+        const directions = [
+          [0, 1, "right"],
+          [1, 0, "down"],
+          [0, -1, "left"],
+          [-1, 0, "up"],
+        ];
+        for (let d = 0; d < 4; d++) {
+          const [dr, dc, dir] = directions[d];
+          if (spiral[r + dr]?.[c + dc] === nextIndex) return dir;
+        }
+      }
+    }
+  }
+  return null;
+};
   
 
   return (
@@ -478,45 +478,47 @@ const SugorokuPage = ({changeBackground}) => {
       )} */}
 
       <div className="board-wrapper">
-        <div className="board-grid" style={{ gridTemplateColumns: `repeat(${size}, 80px)` }}>
-          {spiral.flat().map((taskIndex, i) => (
-            taskIndex < tasks.length + 1 ? // 不要なマスは非表示
-              <SugorokuCell key={i} isDone={taskIndex < position}>
-                {taskIndex < tasks.length + 1 && ( 
-                  <>
-                    {/* アバター */}
-                    {position === taskIndex && <Avatar />} 
+  <div className="board-grid" style={{ gridTemplateColumns: `repeat(${size}, 80px)` }}>
+    {spiral.flat().map((taskIndex, i) => (
+      taskIndex < tasks.length + 1 ? (
+        <SugorokuCell
+          key={i}
+          isDone={taskIndex < position}
+          direction={getDirection(taskIndex)}
+          isLast={taskIndex === tasks.length}
+        >
+          {taskIndex < tasks.length + 1 && (
+            <>
+              {/* アバター */}
+              {position === taskIndex && <Avatar />}
 
-                    {/* 宝箱 */}
-                    {treasurePositions.includes(taskIndex) && (
-                      <div className="treasure-wrapper">
-                        {taskIndex <= position? 
-                          <div onClick={() => handleTreasureClick(bgImgsUrlIdList[treasurePositions.indexOf(taskIndex)][1])}>
-                            <img src={bgImgsUrlIdList[treasurePositions.indexOf(taskIndex)][0]} className="treasure"></img>
-                            <img src="/treasurebox_open.png" alt="宝箱" className="treasure"/>
-                          </div>
-                          : <TreasureBox />
-                        }
-                      </div>
-                    )}
+              {/* 宝箱 */}
+              {treasurePositions.includes(taskIndex) && (
+                <div className="treasure-wrapper">
+                  {taskIndex <= position ? (
+                    <div onClick={() => handleTreasureClick(bgImgsUrlIdList[treasurePositions.indexOf(taskIndex)][1])}>
+                      <img src={bgImgsUrlIdList[treasurePositions.indexOf(taskIndex)][0]} className="treasure" />
+                      <img src="/treasurebox_open.png" alt="宝箱" className="treasure" />
+                    </div>
+                  ) : (
+                    <TreasureBox />
+                  )}
+                </div>
+              )}
 
-                    {/* 矢印 */}
-                    {/* <div className="task-content">
-                      {taskIndex + 1}：{tasks[taskIndex]?.content || ""}
-                      <span className="arrow">{taskIndex !== tasks.length - 1 && getArrow(taskIndex)}</span>
-                    </div> */}
+              {/* スタートとゴールラベル */}
+              {taskIndex === 0 && <span className="start-label">スタート</span>}
+              {taskIndex === tasks.length && <span className="goal-label">ゴール</span>}
+            </>
+          )}
+        </SugorokuCell>
+      ) : (
+        <div key={i} />
+      )
+    ))}
+  </div>
+</div>
 
-                    {/* スタートラベルをゴールラベルと同様に追加 */}
-                    {taskIndex === 0 && <span className="start-label">スタート</span>}
-                    {taskIndex === tasks.length && <span className="goal-label">ゴール</span>}
-                  </>
-                )}
-              </SugorokuCell>
-              : <div key={i}></div>
-
-          ))}
-        </div>
-      </div>
 
       <div className="move-buttons">
         {/* <button onClick={() => setPosition((prev) => Math.max(prev - 1, 0))} className="btn-back">

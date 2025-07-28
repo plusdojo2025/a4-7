@@ -597,7 +597,7 @@ saveRewardBackgrounds = (vacationId, vacationName) => {
                                 {/* 追加課題の列 */}
                                 {additionalHwSchedulesList.map((hw, index) => (
                                     <th key={`additional-${index}`}>
-                                        <button onClick={() => this.deleteColumn(index)}>－</button>
+                                        <button className="delete_column" onClick={() => this.deleteColumn(index)}>－</button>
                                         <br />
                                         <input
                                             type="text"
@@ -612,7 +612,7 @@ saveRewardBackgrounds = (vacationId, vacationName) => {
                                 <th>
                                     {/* 課題追加ボタン */}
                                     <div>
-                                        <button onClick={this.addColumn}>＋</button>
+                                        <button className="add_column" onClick={this.addColumn}>＋</button>
                                     </div>
                                 </th>
                             </tr>
@@ -673,7 +673,7 @@ saveRewardBackgrounds = (vacationId, vacationName) => {
             </div>
     </div>
                 <div>
-                    <button onClick={this.handleSave}>決定</button>
+                    <button className="decision" onClick={this.handleSave}>決定</button>
                 </div>
 
    <text onClick={this.openModal}></text>

@@ -2,33 +2,88 @@
     text-align: center;
 }
 
+/* 休暇選択プルダウン */
+select {
+    font-size: 25px;
+    text-align: center;
+    border-radius: 8px;
+    background-color: white;
+    min-width: 200px;
+    margin: 10px;
+}
+
+/* 日付入力 */
+input[type="date"] {
+    font-size: 30px;
+    border-radius: 8px;
+    margin: 8px;
+}
+
+/* 日付ラベル */
+label {
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+    background:  rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    padding: 0px 16px
+}
+
 /* ヒント */
 .hint-container {
   min-height: 30px; 
 }
+
+/* ヒント表示 */
 .hint {
     background-color: rgba(255, 255, 255, 0.8);
-    color: black;
+    color: #333;
     text-align: center;
-    line-height: 40px;
-
+    line-height: 2;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin: 5px 0;
 }
 
-/* 表 */
-.hint-scheduleTable
- {
-  min-height: 30px; 
-}
-.addHwInput {
-    margin: 0 auto;
+
+/* 決定ボタン */
+.decision {
+    background-color: #f5f5f5;
+    color: #333;
+    border: none;
+    padding: 12px 24px;
+    font-size: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
 }
 
-/* 縦スクロール */
-/* .vertical-scroll-container {
-  max-height: 900px;
-  overflow-y: auto;
-  box-sizing: border-box;
-} */
+/* 削除ボタン */
+.delete_column {
+    border: none; 
+    border-radius: 8px;
+    padding: 12px 12px;
+    font-size: 16px;
+    font-weight: 900;
+    background-color: red;
+    color: white;
+    min-width: 28px;
+    height: 50px;    
+    width: 50px;
+  }
 
+
+.add_column {
+    border: none; 
+    border-radius: 8px;
+    font-weight: bold;
+    padding: 12px 12px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: green;
+    color: white;
+    min-width: 28px;
+    height: 50px;    
+    width: 50px;
+  }
 
 
