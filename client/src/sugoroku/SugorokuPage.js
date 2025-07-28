@@ -168,13 +168,13 @@ const SugorokuPage = ({changeBackground}) => {
       if (nextPos === 0) return nextPos; // スタートは常にOK
       if (nextPos > tasks.length) {
         setMessage("これ以上進めません！");
-        setTimeout(() => setMessage(""), 1000);
+        setTimeout(() => setMessage(""), 3000);
         return prev;
       }
       // if (!tasks[nextPos - 1]?.completed) {
       if (nextPos > completedTasks.length) {
         setMessage("次の宿題を完了しないと進めません！");
-        setTimeout(() => setMessage(""), 1000);
+        setTimeout(() => setMessage(""), 3000);
         return prev;
       }
       if (treasurePositions.includes(nextPos)) {
@@ -183,7 +183,7 @@ const SugorokuPage = ({changeBackground}) => {
       if (nextPos === tasks.length) {
         setMessage("ゴール！がんばったね🎉");
       }
-      setTimeout(() => setMessage(""), 1000);
+      setTimeout(() => setMessage(""), 3000);
       return nextPos;
     });
   };
@@ -422,9 +422,9 @@ const SugorokuPage = ({changeBackground}) => {
       >
         {/* <Header/> */}
 
-      <h2 className="period-title">{periods.find((p) => p.id === selectedPeriodKey)?.name || "期間未選択"}</h2>
+      {/* <h2 className="period-title">{periods.find((p) => p.id === selectedPeriodKey)?.name || "期間未選択"}</h2> */}
       <div className="period-select-wrapper">
-        <label>期間選択：</label>
+        {/* <label>期間選択：</label> */}
         <select
           value={selectedPeriodKey}
           onChange={(e) => {

@@ -29,7 +29,7 @@ class SignupPage extends React.Component {
       return;
     }
 
-    axios.post('/users/signup', { username, password, backgroundId:1, avatarId:1 })
+    axios.post('/users/signup', { username, password, backgroundId:13, avatarId:1 })
       .then(() => {
         this.setState({
           success: 'ユーザ登録が完了しました。ログインしてください。',
@@ -107,7 +107,7 @@ class SignupPage extends React.Component {
 
         {/* ログインページへのリンク */}
         <p style={{ marginTop: '20px' }}>
-          既にアカウントをお持ちの方は <a href="/">こちら</a>
+          すでにアカウントを持っている人は <a href="/" style={{color: "white"}}>こちら</a>
         </p>
       </div>
     );

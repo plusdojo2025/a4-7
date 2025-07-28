@@ -91,7 +91,7 @@ class LoginPage extends React.Component {
 
         {/* ユーザ登録ページへのリンク */}
         <p style={{ marginTop: '20px' }}>
-          新規ユーザ登録は <a href="/signup">こちら</a>
+          まだ登録していない人は <a href="/signup" style={{color: "white"}}>こちら</a>
         </p>
       </div>
     );

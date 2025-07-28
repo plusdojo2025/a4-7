@@ -106,7 +106,7 @@ class Avatar extends React.Component {
         {showModal && (
             <div id='modal'>
               <div id='modalContent-avatar'>
-                <h3>アバターを選択してください</h3>
+                <h3>好きなアバターを選択してね</h3>
                 <div className="avatar-list">
                   {avatarImgUrlImgIdList.map((url_id, index) => (
                     <img

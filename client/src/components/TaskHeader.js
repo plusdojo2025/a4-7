@@ -27,7 +27,7 @@ export default class TaskHeader extends React.Component {
         this.setState({ taskList: shuffledList });
         // ルーレットの結果を表示する
         const result = shuffledList.map(content => content.content).join(' ⇒ ');
-        alert(`取り組む順番: ${result}`);        
+        alert(`この順番でとりくんでみよう！: ${result}`);        
     }
 
     render() {
@@ -37,10 +37,10 @@ export default class TaskHeader extends React.Component {
         <div className="task-header">
             
             {(!taskList || taskList.length === 0) ? 
-                <div><h3>今日のタスク一覧</h3>タスクなし</div> 
+                <div><h3>今日やること</h3>なし</div> 
                 :
                 <div>
-                <h3>今日のタスク一覧</h3>
+                <h3>今日やること</h3>
                 <div className="task-header-list">
                 <ol>
                     {taskList.sort((a, b) => a.contentOrder - b.contentOrder).map((content, index) => (

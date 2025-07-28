@@ -638,9 +638,10 @@ saveRewardBackgrounds = async (vacationId, vacationName) => {
                                     <td>
                                         <input 
                                             type="text" 
-                                            placeholder="予定を入力"
+                                            // placeholder="予定を入力"
                                             value={this.getPrivateScheduleForDate(date.date)}
                                             onChange={(e) => this.handlePrivateScheduleChange(date.date, e.target.value)}
+                                            maxLength={100}
                                         />
                                     </td>
                                     
@@ -649,7 +650,7 @@ saveRewardBackgrounds = async (vacationId, vacationName) => {
                                         <td key={`fixed-${hwIndex}`}>
                                             <input 
                                                 type="text" 
-                                                placeholder="宿題内容を入力"
+                                                // placeholder="宿題内容を入力"
                                                 data-fixed-hw="true"
                                                 value={this.getFixedHwContentForDate(hwIndex, date.date)}
                                                 onChange={(e) => this.handleFixedHwContentChange(hwIndex, date.date, e.target.value)}
@@ -657,6 +658,7 @@ saveRewardBackgrounds = async (vacationId, vacationName) => {
                                                 // onFocus={() => this.showHelpText(hw.helpText)}
                                                 onMouseEnter={() => this.showHelpText(hw)}
                                                 onFocus={() => this.showHelpText(hw)}
+                                                maxLength={100}
                                             />
                                         </td>
                                     ))}
@@ -666,13 +668,14 @@ saveRewardBackgrounds = async (vacationId, vacationName) => {
                                         <td key={`additional-${hwIndex}`}>
                                             <input 
                                                 type="text" 
-                                                placeholder="宿題内容を入力"
+                                                // placeholder="宿題内容を入力"
                                                 value={this.getAdditionalHwContentForDate(hwIndex, date.date)}
                                                 onChange={(e) => this.handleAdditionalHwContentChange(hwIndex, date.date, e.target.value)}
                                                 // onMouseEnter={() => this.showHelpText(hw.helpText)}
                                                 // onFocus={() => this.showHelpText(hw.helpText)}
                                                 onMouseEnter={() => this.showHelpText(hw)}
                                                 onFocus={() => this.showHelpText(hw)}
+                                                maxLength={100}
                                             />
                                         </td>
                                     ))}

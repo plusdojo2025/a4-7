@@ -194,11 +194,13 @@ export default class EventPage extends React.Component {
     render() {
         const {backgroundUrl, events, selectedEventIndex, selectedEventTheme, isPast, content, myLikeCount, isPosted, posts} = this.state;
         return (
-            <div id="event_page"  className='backgroundImage' style={
-                backgroundUrl
-                ? { backgroundImage: `url(${backgroundUrl})` }
-                : { backgroundColor: "#282c34" } // fallback 背景
-            }>
+            <div id="event_page"  className='backgroundImage' 
+                // style={
+                //     backgroundUrl
+                //     ? { backgroundImage: `url(${backgroundUrl})` }
+                //     : { backgroundColor: "#282c34" }
+                // }
+            >
                 {/* 表示イベント選択セレクトボックス　デフォルトは現在開催中のイベント */}
                 <select value={selectedEventIndex} onChange={this.changeEvent}>
                     {events.map((event, index) =>

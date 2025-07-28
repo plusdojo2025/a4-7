@@ -21,7 +21,7 @@ import LogoHeader from './components/LogoHeader';
 function App() {
   const [backgroundUrl, setBackgroundUrl] = useState([]);
   const [vacationId, setVacationId] = useState();
-  const [today, setToday] = useState('2025-07-22');
+  const [today, setToday] = useState('2025-07-27');
   const [todayTasks, setTodayTasks] = useState([]);
   const userId = localStorage.getItem('userId') || "";
 

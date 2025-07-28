@@ -544,7 +544,7 @@ class SchedulePage extends React.Component {
                         ))}
                     </select>
                     <Link to="/scheduleMake"> {/* リロードしないリンク */}
-                        <button>新しい予定を作成</button>
+                        <button>新しく予定を作ろう</button>
                     </Link>
                     {/* <button onClick={()=>{window.location.href = '/scheduleMake'}}>新しい予定を作成</button> */}
                 </div>
@@ -592,6 +592,7 @@ class SchedulePage extends React.Component {
                                             value={privateSchedules[eventIdx].content}
                                             onChange={(e) => this.psInput(e, eventIdx)}
                                             onBlur={() => this.editPrivateSchedule(eventIdx)}
+                                            maxLength={100}
                                             />
                                         );
                                         } else {
