@@ -36,26 +36,11 @@ class SchedulePage extends React.Component {
             vacationId: props.vacationId,
             setVacationId: props.setVacationId, 
             today: props.today,
-            setTodayTasks: props.setTodayTasks
+            setTodayTasks: props.setTodayTasks,
+            setToday: props.setToday
         };
     }
 
-    // componentDidUpdate(prevProps, prevState) {
-    //     // props.today が変わったかを検知
-    //     // console.log("prevProps",prevProps.today);
-    //     // console.log("prevState",prevState.today);
-    //     // console.log("this.props.today",this.props.today);
-    //     // console.log("this.state.today",this.state.today);
-    //     // if (prevState.today !== this.state.today) {
-    //     //     console.log("todayが変更されました:", this.props.today);
-
-    //         // // 例: todayに基づいてタスクを更新する処理
-    //         // this.props.setTodayTasks(this.props.today);
-            
-    //         // // 必要に応じて state に反映
-    //         // this.setState({ today: this.props.today });
-    //     }
-    // }
 
 
     // --------------------------------------------------------------
@@ -374,10 +359,10 @@ class SchedulePage extends React.Component {
         const modalData = [];
         let sugorokuCount = 0;
 
-        // 次の日付を決定する処理
-        const nextDateTemp = new Date(date);
-        nextDateTemp.setDate(nextDateTemp.getDate() + 1);
-        const nextDate = nextDateTemp.toISOString().split('T')[0]; // YYYY-MM-DD形式       
+        // 全日の日付を決定する処理
+        const prevDateTemp = new Date(date);
+        prevDateTemp.setDate(prevDateTemp.getDate() - 1);
+        const prevDate = prevDateTemp.toISOString().split('T')[0]; // YYYY-MM-DD形式       
 
         // 休暇テーブルの決定日(dicision_date)を次の日に移行         
         // const updatedVacation = { ...vacations[vacationId], decisionDate: nextDate};
@@ -386,47 +371,47 @@ class SchedulePage extends React.Component {
         //     .then (json => {console.log(json);})
         // );
 
-        // チェックされていない今日の宿題タスクを次の日に移行する
-        hwSchedules.filter(content => content.contentDate === date && !content.completed).forEach(content => {
-            const updatedContent = { ...content, contentDate: nextDate };
-            requests.push(
-                axios.post('/homeworkSchedules/mod/', updatedContent)
-                .then (json => {console.log(json);})
-            );
-        });
-
-        // 前倒しでチェックされた宿題タスクを今日に移行する
-        hwSchedules.filter(content => content.contentDate > date && content.completed).forEach(content => {
+        // チェックされていない前日より前の宿題タスクを今日に移行する
+        hwSchedules.filter(content => content.contentDate <= prevDate && !content.completed).forEach(content => {
             const updatedContent = { ...content, contentDate: date };
             requests.push(
                 axios.post('/homeworkSchedules/mod/', updatedContent)
                 .then (json => {console.log(json);})
             );
-            sugorokuCount++;
         });
 
-        // 前日より前のチェックを外した宿題タスクを次の日に移行する
-        hwSchedules.filter(content => content.contentDate < date && !content.completed).forEach(content => {
-            const updatedContent = { ...content, contentDate: nextDate};
+        // 前倒しでチェックされた宿題タスクを前日に移行する
+        hwSchedules.filter(content => content.contentDate > prevDate && content.completed).forEach(content => {
+            const updatedContent = { ...content, contentDate: prevDate };
             requests.push(
                 axios.post('/homeworkSchedules/mod/', updatedContent)
                 .then (json => {console.log(json);})
             );
-            sugorokuCount--;
-        });
-
-        // 今日のチェックされた宿題タスクをカウント
-        hwSchedules.filter(content => content.contentDate === date && content.completed).forEach(_ => {
             sugorokuCount++;
         });
 
-        // モーダル表示準備
-        if (sugorokuCount >= 0) {
-            modalData.push(`${sugorokuCount}マス進めます`);
-        }
-        else{
-            modalData.push(`${-sugorokuCount}マス戻りました`);
-        }
+        // // 前日より前のチェックを外した宿題タスクを次の日に移行する
+        // hwSchedules.filter(content => content.contentDate < date && !content.completed).forEach(content => {
+        //     const updatedContent = { ...content, contentDate: nextDate};
+        //     requests.push(
+        //         axios.post('/homeworkSchedules/mod/', updatedContent)
+        //         .then (json => {console.log(json);})
+        //     );
+        //     sugorokuCount--;
+        // });
+
+        // // 今日のチェックされた宿題タスクをカウント
+        // hwSchedules.filter(content => content.contentDate === prevDate && content.completed).forEach(_ => {
+        //     sugorokuCount++;
+        // });
+
+        // // モーダル表示準備
+        // if (sugorokuCount >= 0) {
+        //     modalData.push(`${sugorokuCount}マス進めます`);
+        // }
+        // else{
+        //     modalData.push(`${-sugorokuCount}マス戻りました`);
+        // }
 
         // modalData.push('背景〇〇をゲットしました'); // TODO
         modalData.push('イベントで〇位でした'); // TODO
@@ -459,6 +444,13 @@ class SchedulePage extends React.Component {
         })
     }
 
+    handleDateChange = (e) => {
+        const selectedDate = e.target.value; // yyyy-mm-dd 形式
+        this.state.setToday(selectedDate);
+        this.setState({today: selectedDate});
+        this.dicisionBotton(selectedDate);
+    };
+
     // main -----------------------------------------------------------   
     render() {
         const { 
@@ -473,7 +465,8 @@ class SchedulePage extends React.Component {
             showModalDecide,
             backgroundUrl,
             modalData, 
-            vacationId
+            vacationId, 
+            today
         } = this.state;
 
 
@@ -485,7 +478,7 @@ class SchedulePage extends React.Component {
                             <option>予定を作成してください</option>
                         </select>
                         <Link to="/scheduleMake"> {/* リロードしないリンク */}
-                            <button>新しい予定を作成</button>
+                            <button className="decision">新しい予定を作成する</button>
                         </Link>
                         {/* <button onClick={()=>{window.location.href = '/scheduleMake'}}>新しい予定を作成</button> */}
                     </div>
@@ -531,6 +524,11 @@ class SchedulePage extends React.Component {
 
                 {/* 休暇の選択 および 新しい予定の作成ボタン */}
                 <div>
+                    <div>
+                        <label>今日の日付：</label>
+                        {/* <br/> */}
+                        <input type="date" value={today} onChange={this.handleDateChange} />
+                    </div>      
                     <select onChange={this.handleVacationChange} value={vacationId}>
                         {/* {vacations.map((vacation, index) => (
                             <option key={index}>
@@ -544,7 +542,7 @@ class SchedulePage extends React.Component {
                         ))}
                     </select>
                     <Link to="/scheduleMake"> {/* リロードしないリンク */}
-                        <button>新しく予定を作ろう</button>
+                        <button className="decision">新しい予定を作成する</button>
                     </Link>
                     {/* <button onClick={()=>{window.location.href = '/scheduleMake'}}>新しい予定を作成</button> */}
                 </div>
@@ -561,7 +559,7 @@ class SchedulePage extends React.Component {
                             {columns.map((col, index) => ( 
                                 <th key={index}>{col.columnTitle}</th>
                             ))}
-                            <th><button onClick={this.setAllCheck}>全チェック</button></th>
+                            <th><button className="decision" onClick={this.setAllCheck}>全チェック</button></th>
 
                         </tr>
                     </thead>

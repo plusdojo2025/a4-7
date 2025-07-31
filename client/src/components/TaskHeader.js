@@ -55,7 +55,7 @@ export default class TaskHeader extends React.Component {
                     ))}
                 </ol>
                 </div>
-                <button onClick={()=>{this.rouletButtonClick(taskList)}}>ルーレット</button>
+                <button className="decision" onClick={()=>{this.rouletButtonClick(taskList)}}>ルーレット</button>
                 </div>
             }
             

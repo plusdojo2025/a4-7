@@ -52,7 +52,7 @@ export default class TriviaHeader extends React.Component {
                     <p className='balloon-008'>{trivia ? trivia.content : "豆知識はまだありません。"}</p>
                 </div>
                 <div>
-                    <label>きょうの日付：</label>
+                    <label>今日の日付：</label>
                     <br/>
                     <input type="date" value={today} onChange={this.handleDateChange} />
                 </div>      

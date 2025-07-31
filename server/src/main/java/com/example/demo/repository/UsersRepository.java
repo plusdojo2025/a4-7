@@ -11,6 +11,7 @@ import com.example.demo.entity.Users;
 public interface UsersRepository extends JpaRepository<Users, Integer> {
 
     Optional<Users> findByUsername(String username);
+    Optional<Users> findFirstByUsername(String username);
 
     Users findFirstByUsernameAndPassword(String username, String password);
 }

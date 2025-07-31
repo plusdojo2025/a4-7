@@ -42,6 +42,15 @@ class SignupPage extends React.Component {
         //     state: { message: 'ユーザー登録が完了しました' }
         // });
       })
+      .then(() => {
+        // axios.get("/users/"+username)
+        // .then(json => {
+        //   console.log("ユーザ情報取得", json.data);
+          // axios.post('/user-images', {userId: 7, imageType:0, imageId:1})
+          // .then(json => console.log("user_imagersに初期アバター登録完了"))
+          // .catch(error => console.error(error))
+        })
+      // })
       .catch(error => {
         let message = '登録に失敗しました。もう一度お試しください。';
         if (error.response?.status === 409) {
@@ -49,6 +58,8 @@ class SignupPage extends React.Component {
         }
         this.setState({ error: message });
       });
+
+      
   };
 
   render() {

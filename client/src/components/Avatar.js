@@ -9,13 +9,16 @@ class Avatar extends React.Component {
     this.state = {
       userId: localStorage.getItem('userId') || "",
       avatarImgUrlImgIdList: [],
-      currentAvatarImgUrl: "",
-      showModal: false
+      currentAvatarImgUrl: props.avatarUrl || "",
+      showModal: false, 
+      setAvatarUrl: props.setAvatarUrl ||  (() => {})
     }
   }
 
   componentDidMount = () => {
-    const {userId} = this.state;
+    const {userId, currentAvatarImgUrl, setAvatarUrl} = this.state;
+
+    
 
       // avatar画像を全取得
       axios.get('/user-images/useravatar/' + userId)
@@ -37,9 +40,33 @@ class Avatar extends React.Component {
         console.error('avatar画像の取得に失敗しました:', error);
       });
         
-  
+  if(!currentAvatarImgUrl){
       // ユーザーの現在のアバター画像を取得
-        axios.get('/users/' + userId)
+        // axios.get('/users/' + userId)
+        // .then(userRes => {
+        //     const avatarId = userRes.data.avatarId;
+        //     return axios.get('/api/avatars/' + avatarId, {responseType: 'blob'});
+        // })
+        // .then(bgRes => {
+        //     const blob = bgRes.data;
+        //     const imageUrl = URL.createObjectURL(blob);
+        //     setAvatarUrl(imageUrl);
+        //     this.setState({
+        //         currentAvatarImgUrl: imageUrl
+        //     });
+        // })
+        // .catch(error => {
+        //   console.error('avatar画像の取得に失敗しました:', error);
+        // })
+        this.setAvatar(userId)
+    }
+ 
+
+  }
+
+  setAvatar = (userId) => {
+    const {setAvatarUrl} = this.state;
+    axios.get('/users/' + userId)
         .then(userRes => {
             const avatarId = userRes.data.avatarId;
             return axios.get('/api/avatars/' + avatarId, {responseType: 'blob'});
@@ -47,6 +74,7 @@ class Avatar extends React.Component {
         .then(bgRes => {
             const blob = bgRes.data;
             const imageUrl = URL.createObjectURL(blob);
+            setAvatarUrl(imageUrl);
             this.setState({
                 currentAvatarImgUrl: imageUrl
             });
@@ -54,8 +82,6 @@ class Avatar extends React.Component {
         .catch(error => {
           console.error('avatar画像の取得に失敗しました:', error);
         })
- 
-
   }
 
   openModal = () => {
@@ -79,13 +105,13 @@ class Avatar extends React.Component {
       .then(json => {
         axios.post("/users", json)
           .then(json => {
-            console.log(json.data)
+            console.log(json.data);
           })
           .catch(error => {
             console.error('ユーザー情報の更新に失敗しました:', error);
           });
       })
-      .then(_=> {this.componentDidMount()})
+      .then(_=> {this.setAvatar(userId)})
       .then(_=> {this.setState({showModal: false})})
   }
 

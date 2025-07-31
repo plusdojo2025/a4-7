@@ -44,6 +44,8 @@ const SugorokuPage = ({changeBackground}) => {
   const [userId, _] = useState(localStorage.getItem('userId') || "");
   const [bgImgsUrlIdList, setBgImgsUrlIdList] = useState([]); // [[url, background_id], ...]
   const [treasurePositions, setTreasurePositions] = useState([]); 
+  const [messageCanAdvance, setMessageCanAdvance] = useState([]); // 何マス進めるかの表示
+  const [avatarUrl, setAvatarUrl] = useState();
 
   const [unlockedBackgrounds, setUnlockedBackgrounds] = useState(["natsu/0.png"]);
   const [currentBackground, setCurrentBackground] = useState([]); // [url, background_id]
@@ -490,7 +492,7 @@ const SugorokuPage = ({changeBackground}) => {
           {taskIndex < tasks.length + 1 && (
             <>
               {/* アバター */}
-              {position === taskIndex && <Avatar />}
+              {position === taskIndex && <Avatar avatarUrl={avatarUrl} setAvatarUrl={setAvatarUrl}/>}
 
               {/* 宝箱 */}
               {treasurePositions.includes(taskIndex) && (
@@ -520,6 +522,7 @@ const SugorokuPage = ({changeBackground}) => {
 </div>
 
 
+      
       <div className="move-buttons">
         {/* <button onClick={() => setPosition((prev) => Math.max(prev - 1, 0))} className="btn-back">
           もどる
@@ -531,6 +534,7 @@ const SugorokuPage = ({changeBackground}) => {
           現在位置リセット
         </button>
       </div>
+      <label>{completedTasks.length - position}マス進めるよ</label>
     </div>
   );
 };

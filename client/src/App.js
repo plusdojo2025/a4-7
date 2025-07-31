@@ -21,7 +21,7 @@ import LogoHeader from './components/LogoHeader';
 function App() {
   const [backgroundUrl, setBackgroundUrl] = useState([]);
   const [vacationId, setVacationId] = useState();
-  const [today, setToday] = useState('2025-07-27');
+  const [today, setToday] = useState('2025-07-31');
   const [todayTasks, setTodayTasks] = useState([]);
   const userId = localStorage.getItem('userId') || "";
 
@@ -60,7 +60,7 @@ function App() {
           <Routes>
             <Route index element={<LoginPage />} />
             <Route path='/signup' element={<SignupPage />} />
-            <Route path='/schedule' element={<SchedulePage key={today} today={today} vacationId={vacationId} setVacationId={setVacationId} setTodayTasks={setTodayTasks}/>} /> {/* ket={変数}で、変数が変更したら再マウント */}
+            <Route path='/schedule' element={<SchedulePage key={today} today={today} setToday={setToday} vacationId={vacationId} setVacationId={setVacationId} setTodayTasks={setTodayTasks}/>} /> {/* ket={変数}で、変数が変更したら再マウント */}
             <Route path='/event' element={<EventPage />} />
             <Route path='/sugoroku' element={<SugorokuPage changeBackground={setBackgroundUrl} vacationId={vacationId} setVacationId={setVacationId} />} />
             <Route path='/scheduleMake' element={<ScheduleMakePage />} />

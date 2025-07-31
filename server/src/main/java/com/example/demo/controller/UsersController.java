@@ -92,6 +92,10 @@ public class UsersController {
         // 登録成功は201 Created
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
+    
+//    @GetMapping("/{username}")
+//    public Optional<Users> getUserByUserName(@PathVariable String username) {
+//        return usersRepository.findFirstByUsername(username);
+//    }
     
 }
